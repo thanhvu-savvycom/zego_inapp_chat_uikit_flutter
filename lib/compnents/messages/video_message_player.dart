@@ -1,13 +1,15 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:chewie/chewie.dart';
+import 'package:better_player/better_player.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:zego_imkit/compnents/messages/video_message_preview.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:zego_imkit/compnents/common/single_tap_detector.dart';
 import 'package:zego_imkit/services/services.dart';
-import 'package:video_player/video_player.dart';
+import 'package:zego_imkit/utils/custom_theme.dart';
 
 class ZegoVideoMessagePlayer extends StatefulWidget {
   const ZegoVideoMessagePlayer(this.message, {Key? key}) : super(key: key);
@@ -19,88 +21,113 @@ class ZegoVideoMessagePlayer extends StatefulWidget {
 }
 
 class ZegoVideoMessagePlayerState extends State<ZegoVideoMessagePlayer> {
-  late VideoPlayerController videoPlayerController;
-  late ChewieController chewieController;
+  BetterPlayerController? _betterPlayerController;
+  YoutubePlayerController? _youtubeController;
+  String? youtubeId;
 
   @override
   void dispose() async {
-    chewieController.pause();
-    chewieController.dispose();
-    videoPlayerController.dispose();
+    _betterPlayerController?.dispose(forceDispose: true);
+    _youtubeController?.dispose();
     super.dispose();
   }
 
   @override
   void initState() {
-    final ZIMVideoMessage message =
-        widget.message.data.value as ZIMVideoMessage;
-    if (message.fileLocalPath.isNotEmpty &&
-        File(message.fileLocalPath).existsSync()) {
-      ZegoIMKitLogger.fine(
-          'ZegoVideoMessagePlayer: initPlayer from local file: ${message.fileLocalPath}');
-      videoPlayerController =
-          VideoPlayerController.file(File(message.fileLocalPath.urlEncode));
+    final ZIMVideoMessage message = widget.message.data.value as ZIMVideoMessage;
+    youtubeId = YoutubePlayer.convertUrlToId(message.fileDownloadUrl);
+
+    if (youtubeId == null) {
+      BetterPlayerDataSource? betterPlayerDataSource;
+      if (message.fileLocalPath.isNotEmpty && File(message.fileLocalPath).existsSync()) {
+        betterPlayerDataSource = BetterPlayerDataSource(BetterPlayerDataSourceType.file, message.fileLocalPath);
+      } else {
+        betterPlayerDataSource = BetterPlayerDataSource(BetterPlayerDataSourceType.network, message.fileDownloadUrl);
+      }
+
+      _betterPlayerController = BetterPlayerController(
+          const BetterPlayerConfiguration(
+              autoPlay: true,
+              showPlaceholderUntilPlay: false,
+              // fullScreenByDefault: true,
+              fit: BoxFit.contain,
+              autoDetectFullscreenAspectRatio: true),
+          betterPlayerDataSource: betterPlayerDataSource);
     } else {
-      ZegoIMKitLogger.fine(
-          'ZegoVideoMessagePlayer: initPlayer from network: ${message.fileDownloadUrl}');
-      videoPlayerController =
-          VideoPlayerController.network(message.fileDownloadUrl);
+      _youtubeController = YoutubePlayerController(
+        initialVideoId: YoutubePlayer.convertUrlToId(youtubeId!) ?? '',
+        flags: const YoutubePlayerFlags(
+          useHybridComposition: false,
+          forceHD: true,
+          captionLanguage: 'vi',
+        ),
+      );
     }
 
-    chewieController = ChewieController(
-        videoPlayerController: videoPlayerController,
-        looping: true,
-        customControls:
-            const MaterialDesktopControls(), // always use DesktopControls
-        placeholder: Center(child: ZegoVideoMessagePreview(widget.message)))
-      ..setVolume(kIsWeb ? 0.0 : 1.0)
-      ..play();
-
-    Future.delayed(const Duration(seconds: 4)).then((value) {
-      if (chewieController.videoPlayerController.value.isInitialized == false) {
-        ZegoIMKitLogger.severe(
-            'videoPlayerController is not initialized, ${widget.message.zim.fileLocalPath}');
-        ZegoIMKitLogger.shout(context,
-            "Seems Can't play this video, ${widget.message.zim.fileLocalPath}");
-      }
-    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
     return Material(
+      type: MaterialType.transparency,
       child: Stack(
-        alignment: Alignment.center,
         children: [
-          FutureBuilder(
-            future: videoPlayerController.initialize(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                ZegoIMKitLogger.fine(
-                    'ZegoVideoMessagePlayer: videoPlayerController initialize done');
-                return Chewie(
-                    key: ValueKey(snapshot.hashCode),
-                    controller: chewieController);
-              } else {
-                ZegoIMKitLogger.fine(
-                    'ZegoVideoMessagePlayer: videoPlayerController initializing...');
-                return Chewie(
-                    key: ValueKey(snapshot.hashCode),
-                    controller: chewieController);
-              }
-            },
-          ),
-          Positioned(
-            top: 0,
-            right: 0,
-            child: IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () => Navigator.pop(context),
+          Container(
+              alignment: Alignment.center,
+              color: black,
+              child: youtubeId == null ? _normalVideoWidget() : _youtubeVideoWidget()),
+          if (isPortrait)
+            Align(
+              alignment: Alignment.topLeft,
+              child: Container(
+                padding: EdgeInsets.only(top: 60.h, left: 20.w),
+                child: SingleTapDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Icon(
+                    CupertinoIcons.arrow_left,
+                    color: white,
+                    size: 22.w,
+                  ),
+                ),
+              ),
             ),
-          ),
         ],
       ),
     );
+  }
+
+  Widget _normalVideoWidget() {
+    return _betterPlayerController == null
+        ? const SizedBox()
+        : BetterPlayer(
+            controller: _betterPlayerController!,
+          );
+  }
+
+  Widget _youtubeVideoWidget() {
+    return _youtubeController == null
+        ? const SizedBox()
+        : YoutubePlayer(
+            aspectRatio: 16 / 9,
+            bottomActions: [
+              CurrentPosition(),
+              10.horizontalSpace,
+              ProgressBar(
+                isExpanded: true,
+                colors: ProgressBarColors(
+                    playedColor: white,
+                    handleColor: white,
+                    bufferedColor: white.withOpacity(0.3),
+                    backgroundColor: white.withOpacity(0.5)),
+              ),
+              10.horizontalSpace,
+              RemainingDuration(),
+              FullScreenButton(),
+            ],
+            controller: _youtubeController!);
   }
 }

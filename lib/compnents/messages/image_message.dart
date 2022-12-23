@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:zego_imkit/compnents/messages/fullscreen_image_page.dart';
 
 import 'package:zego_imkit/services/services.dart';
 
@@ -30,8 +31,7 @@ class ZegoImageMessage extends StatelessWidget {
         return Flexible(
           child: GestureDetector(
             // TODO save image
-            onTap: () => onPressed?.call(
-                context, this.message, () {}), // TODO default onPressed
+            onTap: () => _onPressed(context, message), // TODO default onPressed
             onLongPress: () => onLongPress?.call(context, this.message, () {}),
             child: AspectRatio(
               aspectRatio: message.aspectRatio,
@@ -39,34 +39,49 @@ class ZegoImageMessage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 child: message.isSender
                     ? FutureBuilder(
-                        future: File(message.fileLocalPath).exists(),
-                        builder: (context, snapshot) {
-                          return snapshot.hasData &&
-                                  (snapshot.data as bool == true)
-                              ? Image.file(File(message.fileLocalPath))
-                              : CachedNetworkImage(
-                                  imageUrl: message.largeImageDownloadUrl,
-                                  fit: BoxFit.cover,
-                                  errorWidget: (context, _, __) => const Icon(
-                                      Icons.image_not_supported_outlined),
-                                  placeholder: (context, url) =>
-                                      const Icon(Icons.image_outlined),
-                                );
-                        },
-                      )
+                  future: File(message.fileLocalPath).exists(),
+                  builder: (context, snapshot) {
+                    return snapshot.hasData &&
+                        (snapshot.data as bool == true)
+                        ? Image.file(File(message.fileLocalPath))
+                        : CachedNetworkImage(
+                      imageUrl: message.largeImageDownloadUrl,
+                      fit: BoxFit.cover,
+                      errorWidget: (context, _, __) =>
+                      const Icon(
+                          Icons.image_not_supported_outlined),
+                      placeholder: (context, url) =>
+                      const Icon(Icons.image_outlined),
+                    );
+                  },
+                )
                     : CachedNetworkImage(
-                        imageUrl: message.largeImageDownloadUrl,
-                        fit: BoxFit.cover,
-                        errorWidget: (context, _, __) =>
-                            const Icon(Icons.image_not_supported_outlined),
-                        placeholder: (context, url) =>
-                            const Icon(Icons.image_outlined),
-                      ),
+                  imageUrl: message.largeImageDownloadUrl,
+                  fit: BoxFit.cover,
+                  errorWidget: (context, _, __) =>
+                  const Icon(Icons.image_not_supported_outlined),
+                  placeholder: (context, url) =>
+                  const Icon(Icons.image_outlined),
+                ),
               ),
             ),
           ),
         );
       },
     );
+  }
+
+  void _onPressed(BuildContext context, ZIMImageMessage message) {
+    defaultAction() =>
+        Navigator.of(context, rootNavigator: true).push(
+            MaterialPageRoute(builder: (context) => FullscreenImagePage(imageUrls: [message.fileDownloadUrl],),)).then((
+            value) {
+          ZegoIMKitLogger.fine('ZegoImageMessage: showImage end');
+        });
+    if (onPressed != null) {
+      onPressed!.call(context, this.message, defaultAction);
+    } else {
+      defaultAction();
+    }
   }
 }

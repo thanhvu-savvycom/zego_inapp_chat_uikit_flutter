@@ -86,7 +86,7 @@ class _ZegoConversationWidgetState extends State<ZegoConversationWidget> {
                               const SizedBox(height: 8),
                               Builder(builder: (context) {
                                 Widget defaultWidget =
-                                    defaultlastMessageBuilder(
+                                    defaultLastMessageBuilder(
                                         conversation.lastMessage);
                                 return widget.lastMessageBuilder?.call(
                                         context,
@@ -105,7 +105,7 @@ class _ZegoConversationWidgetState extends State<ZegoConversationWidget> {
                                 conversation.lastMessage!.timestamp)
                             : null;
                         Widget defaultWidget =
-                            defaultlastMessageTimeBuilder(messageTime);
+                            defaultLastMessageTimeBuilder(messageTime);
                         return widget.lastMessageTimeBuilder
                                 ?.call(context, messageTime, defaultWidget) ??
                             defaultWidget;
@@ -118,7 +118,7 @@ class _ZegoConversationWidgetState extends State<ZegoConversationWidget> {
         });
   }
 
-  Widget defaultlastMessageBuilder(ZIMMessage? message) {
+  Widget defaultLastMessageBuilder(ZIMMessage? message) {
     if (message == null) {
       return const SizedBox.shrink();
     }
@@ -129,7 +129,7 @@ class _ZegoConversationWidgetState extends State<ZegoConversationWidget> {
     );
   }
 
-  Widget defaultlastMessageTimeBuilder(DateTime? messageTime) {
+  Widget defaultLastMessageTimeBuilder(DateTime? messageTime) {
     if (messageTime == null) {
       return const SizedBox.shrink();
     }

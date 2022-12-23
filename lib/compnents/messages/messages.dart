@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
+import 'package:zego_imkit/compnents/internals/icon_defines.dart';
 import 'package:zego_imkit/services/services.dart';
+import 'package:zego_imkit/utils/custom_theme.dart';
 
 import '../common/common.dart';
 import 'audio_message.dart';
@@ -25,39 +29,26 @@ class ZegoIMKitMessageWidget extends StatelessWidget {
   }) : super(key: key);
 
   final ZegoIMKitMessage message;
-  final Widget Function(
-          BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)?
-      avatarBuilder;
-  final Widget Function(
-          BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)?
-      statusBuilder;
-  final Widget Function(
-          BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)?
-      timestampBuilder;
-  final void Function(BuildContext context, ZegoIMKitMessage message,
-      Function defaultAction)? onPressed;
-  final void Function(BuildContext context, ZegoIMKitMessage message,
-      Function defaultAction)? onLongPress;
+  final Widget Function(BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)? avatarBuilder;
+  final Widget Function(BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)? statusBuilder;
+  final Widget Function(BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)? timestampBuilder;
+  final void Function(BuildContext context, ZegoIMKitMessage message, Function defaultAction)? onPressed;
+  final void Function(BuildContext context, ZegoIMKitMessage message, Function defaultAction)? onLongPress;
 
   // TODO default onPressed onLongPress action
   // TODO custom meesage
   Widget buildMessage(BuildContext context, ZegoIMKitMessage message) {
     switch (message.data.value.type) {
       case ZIMMessageType.text:
-        return ZegoTextMessage(
-            onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZegoTextMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.audio:
-        return ZegoAudioMessage(
-            onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZegoAudioMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.video:
-        return ZegoVideoMessage(
-            onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZegoVideoMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.file:
-        return ZegoFileMessage(
-            onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZegoFileMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.image:
-        return ZegoImageMessage(
-            onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZegoImageMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
 
       default:
         return Text(message.data.value.type.toString());
@@ -65,54 +56,97 @@ class ZegoIMKitMessageWidget extends StatelessWidget {
   }
 
   Widget buildStatus(BuildContext context, ZegoIMKitMessage message) {
-    Widget defaultStatusWidget = ZegoMessageStatusDot(message);
-    return statusBuilder?.call(context, message, defaultStatusWidget) ??
-        defaultStatusWidget;
+    // Widget defaultStatusWidget = ZegoMessageStatusDot(message);
+    Widget defaultStatusWidget = ValueListenableBuilder<ZIMMessage>(
+        valueListenable: message.data,
+        builder: (context, ZIMMessage message, child) {
+          String? icon;
+          if (message.sentStatus == ZIMMessageSentStatus.success) {
+            icon = PrebuiltChatIconUrls.iconSent;
+          } else if (message.sentStatus == ZIMMessageSentStatus.failed) {
+            icon = PrebuiltChatIconUrls.iconWarning;
+          } else {
+            icon = PrebuiltChatIconUrls.iconSending;
+          }
+          return Column(
+            children: [
+              4.verticalSpace,
+              Row(
+                children: [
+                  PrebuiltChatImage.asset(icon, width: 12.r, height: 12.r),
+                  Padding(
+                    padding: EdgeInsets.only(left: 6.w),
+                    child: Text(
+                      "Không gửi được tin nhắn",
+                      style: Theme.of(context).textTheme.smallNormal.copyWith(color: danger),
+                    ),
+                  )
+                ],
+              ),
+            ],
+          );
+        });
+    return statusBuilder?.call(context, message, defaultStatusWidget) ?? defaultStatusWidget;
   }
 
   Widget buildAvatar(BuildContext context, ZegoIMKitMessage message) {
-    Widget defaultAvatarWidget =
-        ZegoIMKitAvatar(userID: message.senderUserID, width: 50, height: 50);
-    return avatarBuilder?.call(context, message, defaultAvatarWidget) ??
-        defaultAvatarWidget;
+    Widget defaultAvatarWidget = Padding(
+      padding: EdgeInsets.only(right: 12.w),
+      child: ZegoIMKitAvatar(userID: message.senderUserID),
+    );
+    return avatarBuilder?.call(context, message, defaultAvatarWidget) ?? defaultAvatarWidget;
   }
 
-  // TODO how to custom laytout
+  Widget buildTime(BuildContext context, ZegoIMKitMessage message) {
+    return ValueListenableBuilder<ZIMMessage>(
+        valueListenable: message.data,
+        builder: (context, ZIMMessage message, child) {
+          return Padding(
+              padding: EdgeInsets.symmetric(horizontal: 7.w),
+              child: Text(
+                DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(message.timestamp)),
+                style: Theme.of(context).textTheme.smallNormal.copyWith(color: dark7),
+              ));
+        });
+  }
+
+  // TODO how to custom layout
   // TODO timestamp
-  List<Widget> localMessage(BuildContext context, ZegoIMKitMessage message) {
-    return [
-      buildMessage(context, message),
-      // buildAvatar(context, message),
-      buildStatus(context, message),
-    ];
+  Widget localMessage(BuildContext context, ZegoIMKitMessage message) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            buildTime(context, message),
+            buildMessage(context, message),
+          ],
+        ),
+        // buildAvatar(context, message),
+        buildStatus(context, message),
+      ],
+    );
   }
 
-  List<Widget> remoteMessage(BuildContext context, ZegoIMKitMessage message) {
-    return [
-      buildAvatar(context, message),
-      const SizedBox(width: 10),
-      buildMessage(context, message),
-    ];
+  Widget remoteMessage(BuildContext context, ZegoIMKitMessage message) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        buildAvatar(context, message),
+        buildMessage(context, message),
+        buildTime(context, message),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-      child: FractionallySizedBox(
-        widthFactor: 0.66,
-        alignment:
-            message.isSender ? Alignment.centerRight : Alignment.centerLeft,
-        child: Row(
-          mainAxisAlignment: message.isSender
-              ? MainAxisAlignment.end
-              : MainAxisAlignment.start,
-          children: [
-            if (message.isSender) ...localMessage(context, message),
-            if (!message.isSender) ...remoteMessage(context, message),
-          ],
-        ),
-      ),
-    );
+    return (message.isSender) ? localMessage(context, message) : remoteMessage(context, message);
   }
 }

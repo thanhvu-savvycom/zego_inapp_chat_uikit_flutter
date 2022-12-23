@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:zego_imkit/compnents/internals/icon_defines.dart';
 import 'package:zego_imkit/zego_imkit.dart';
 
 extension ZIMMessageExtend on ZIMMessage {
@@ -123,21 +124,22 @@ extension ZIMMessageExtend on ZIMMessage {
 }
 
 extension ZIMImageMessageExtend on ZIMImageMessage {
-  double get aspectRatio => (originalImageWidth / originalImageHeight) > 0
-      ? (originalImageWidth / originalImageHeight)
-      : 1.0;
+  double get aspectRatio =>
+      (originalImageWidth / originalImageHeight) > 0 ? (originalImageWidth / originalImageHeight) : 1.0;
 }
 
 extension ZIMUserFullInfoExtend on ZIMUserFullInfo {
   // TODO use ValueListenableBuilder
   // or ZIMUserFullInfo -> ZegoIMKitUser
-  Widget get icon {
-    Widget placeholder = const Icon(Icons.person);
+  Widget icon({double? width, double? height}) {
+    Widget placeholder = PrebuiltChatImage.asset(PrebuiltChatIconUrls.iconAvatar, width: width, height: height);
     return userAvatarUrl.isEmpty
         ? placeholder
         : CachedNetworkImage(
             imageUrl: userAvatarUrl,
             fit: BoxFit.cover,
+            width: width,
+            height: height,
             errorWidget: (context, _, __) => placeholder,
             placeholder: (context, url) => placeholder,
           );
@@ -147,9 +149,7 @@ extension ZIMUserFullInfoExtend on ZIMUserFullInfo {
 extension ZIMString on String {
   ZIMConversationType? toConversationType() {
     try {
-      return ZIMConversationType.values
-          .where((element) => element.name == this)
-          .first;
+      return ZIMConversationType.values.where((element) => element.name == this).first;
     } catch (e) {
       return null;
     }
@@ -158,12 +158,15 @@ extension ZIMString on String {
 
 extension ZIMConversationExtend on ZIMConversation {
   String get id => conversationID;
+
   set id(String value) => conversationID = value;
 
   String get name => conversationName.isEmpty ? 'Chat' : conversationName;
+
   set name(String value) => conversationName = value;
 
   String get url => conversationAvatarUrl;
+
   set url(String value) => conversationAvatarUrl = value;
 
   equal(ZIMConversation other) => id == other.id && type == other.type;

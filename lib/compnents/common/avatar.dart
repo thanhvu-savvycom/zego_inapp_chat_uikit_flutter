@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:zego_imkit/services/services.dart';
+
+import '../internals/icon_defines.dart';
 
 class ZegoIMKitAvatar extends StatelessWidget {
   const ZegoIMKitAvatar(
@@ -11,20 +14,28 @@ class ZegoIMKitAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: width,
-      height: height,
-      child: FutureBuilder(
-        // TODO auto update user's avatar
-        future: ZegoIMKit().queryUser(userID),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return (snapshot.data as ZIMUserFullInfo).icon;
-          } else {
-            return const Icon(Icons.person);
-          }
-        },
-      ),
+    return ScreenUtilInit(
+      designSize: const Size(375, 812),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (BuildContext context, Widget? child) {
+        return SizedBox(
+          width: width ?? 32.r,
+          height: height ?? 32.r,
+          child: FutureBuilder(
+            // TODO auto update user's avatar
+            future: ZegoIMKit().queryUser(userID),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return (snapshot.data as ZIMUserFullInfo).icon(width: width, height: height);
+              } else {
+                return PrebuiltChatImage.asset(
+                    PrebuiltChatIconUrls.iconAvatar, width: width, height: height);
+              }
+            },
+          ),
+        );
+      },
     );
   }
 }

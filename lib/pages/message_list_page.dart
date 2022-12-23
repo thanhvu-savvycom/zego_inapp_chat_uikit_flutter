@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:zego_imkit/utils/custom_theme.dart';
 import 'package:zego_imkit/zego_imkit.dart';
 
 class ZegoMessageListPage extends StatelessWidget {
@@ -24,6 +26,7 @@ class ZegoMessageListPage extends StatelessWidget {
     this.messageListErrorBuilder,
     this.messageListLoadingBuilder,
     this.theme,
+    this.appName
   }) : super(key: key);
 
   /// this page's conversationID
@@ -43,8 +46,7 @@ class ZegoMessageListPage extends StatelessWidget {
 
   // if you want customize the appBar, use appBarBuilder return your custom appBar
   // if you don't want use appBar, return null
-  final AppBar? Function(BuildContext context, AppBar defaultAppBar)?
-      appBarBuilder;
+  final AppBar? Function(BuildContext context, AppBar defaultAppBar)? appBarBuilder;
 
   /// To add your own action, use the [messageInputActions] parameter like this:
   ///
@@ -70,8 +72,7 @@ class ZegoMessageListPage extends StatelessWidget {
   final void Function(ZegoIMKitMessage)? onMessageSent;
 
   /// Called before a message is sent.
-  final FutureOr<ZegoIMKitMessage> Function(ZegoIMKitMessage)?
-      preMessageSending;
+  final FutureOr<ZegoIMKitMessage> Function(ZegoIMKitMessage)? preMessageSending;
 
   /// By default, [ZegoMessageInput] will show a button to pick file.
   /// If you don't want to show this button, set [showPickFileButton] to false.
@@ -86,80 +87,95 @@ class ZegoMessageListPage extends StatelessWidget {
   /// The [ScrollController] to use. if not provided, a default one will be created.
   final ScrollController? messageListScrollController;
 
-  final void Function(BuildContext context, ZegoIMKitMessage message,
-      Function defaultAction)? onMessageItemPressd;
-  final void Function(BuildContext context, ZegoIMKitMessage message,
-      Function defaultAction)? onMessageItemLongPress;
-  final Widget Function(
-          BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)?
-      messageItemBuilder;
-  final Widget Function(BuildContext context, Widget defaultWidget)?
-      messageListErrorBuilder;
-  final Widget Function(BuildContext context, Widget defaultWidget)?
-      messageListLoadingBuilder;
+  final void Function(BuildContext context, ZegoIMKitMessage message, Function defaultAction)? onMessageItemPressd;
+  final void Function(BuildContext context, ZegoIMKitMessage message, Function defaultAction)? onMessageItemLongPress;
+  final Widget Function(BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)? messageItemBuilder;
+  final Widget Function(BuildContext context, Widget defaultWidget)? messageListErrorBuilder;
+  final Widget Function(BuildContext context, Widget defaultWidget)? messageListLoadingBuilder;
 
   // theme
   final ThemeData? theme;
+  final String? appName;
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: theme ?? Theme.of(context),
-      child: Scaffold(
-        appBar: appBarBuilder != null
-            ? appBarBuilder!.call(context, buildAppBar(context))
-            : buildAppBar(context),
-        body: Column(
-          children: [
-            ZegoMessageListView(
-              conversationID: conversationID,
-              conversationType: conversationType,
-              onPressed: onMessageItemPressd,
-              itemBuilder: messageItemBuilder,
-              onLongPress: onMessageItemLongPress,
-              loadingBuilder: messageListLoadingBuilder,
-              errorBuilder: messageListErrorBuilder,
-              scrollController: messageListScrollController,
-              theme: theme,
-            ),
-            ZegoMessageInput(
-              conversationID: conversationID,
-              conversationType: conversationType,
-              actions: messageInputActions,
-              onMessageSent: onMessageSent,
-              preMessageSending: preMessageSending,
-              inputDecoration: inputDecoration,
-              showPickFileButton: showPickFileButton,
-              editingController: editingController,
-              theme: theme,
-            ),
-          ],
-        ),
-      ),
-    );
+    return ScreenUtilInit(
+        designSize: const Size(375, 812),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        builder: (context, child) {
+          return Theme(
+              data: theme ?? Theme.of(context),
+              child: ValueListenableBuilder(
+                  valueListenable: ZegoIMKit().getConversation(conversationID, conversationType).data,
+                  builder: (context, ZIMConversation conversation, child) {
+                    return Scaffold(
+                        appBar: appBarBuilder != null
+                            ? appBarBuilder!.call(context, buildAppBar(context))
+                            : buildAppBar(context),
+                        body: Container(
+                            alignment: Alignment.center,
+                            child: Column(
+                              children: [
+                                conversation.lastMessage != null
+                                    ? ZegoMessageListView(
+                                        conversationID: conversationID,
+                                        conversationType: conversationType,
+                                        onPressed: onMessageItemPressd,
+                                        itemBuilder: messageItemBuilder,
+                                        onLongPress: onMessageItemLongPress,
+                                        loadingBuilder: messageListLoadingBuilder,
+                                        errorBuilder: messageListErrorBuilder,
+                                        scrollController: messageListScrollController,
+                                        theme: theme,
+                                      )
+                                    : Text(
+                                        "Gửi tin nhắn đến chuyên gia của chúng tôi để nhận tư vấn nhé!",
+                                        style: Theme.of(context).textTheme.body1.copyWith(color: dark6),
+                                      ),
+                                ZegoMessageInput(
+                                  conversationID: conversationID,
+                                  conversationType: conversationType,
+                                  actions: messageInputActions,
+                                  onMessageSent: onMessageSent,
+                                  preMessageSending: preMessageSending,
+                                  inputDecoration: inputDecoration,
+                                  showPickFileButton: showPickFileButton,
+                                  editingController: editingController,
+                                  theme: theme,
+                                ),
+                              ],
+                            )));
+                  }));
+        });
   }
 
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
-      title: ValueListenableBuilder(
-        valueListenable:
-            ZegoIMKit().getConversation(conversationID, conversationType).data,
-        builder: (context, ZIMConversation conversation, child) {
-          return Row(
-            children: [
-              CircleAvatar(child: conversation.icon),
-              child!,
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(conversation.name, style: const TextStyle(fontSize: 16)),
-                  Text(conversation.id, style: const TextStyle(fontSize: 12))
-                ],
-              )
-            ],
-          );
-        },
-        child: const SizedBox(width: 20 * 0.75),
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leadingWidth: 50.w,
+      titleSpacing: 0,
+      leading: (Navigator.of(context).canPop() == true
+          ? GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+              },
+              child: Padding(
+                padding: EdgeInsets.only(left: 16.w, bottom: 5, top: 5, right: 5),
+                child: Icon(
+                  CupertinoIcons.arrow_left,
+                  color: dark1,
+                  size: 22.w,
+                ),
+              ),
+            )
+          : null),
+      // iconTheme: IconThemeData(color: iconColor ?? R.color.black),
+      title: Text(
+        ZegoIMKit().getConversation(conversationID, conversationType).name,
+        textAlign: TextAlign.center,
+        style: Theme.of(context).textTheme.h5Bold,
       ),
       actions: appBarActions,
     );

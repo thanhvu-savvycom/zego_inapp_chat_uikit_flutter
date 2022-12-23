@@ -54,11 +54,7 @@ class ZegoVideoMessage extends StatelessWidget {
   }
 
   void playVideo(BuildContext context) {
-    showBottomSheet(
-            context: context,
-            builder: (context) => ZegoVideoMessagePlayer(message))
-        .closed
-        .then((value) {
+    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => ZegoVideoMessagePlayer(message),)).then((value) {
       ZegoIMKitLogger.fine('ZegoVideoMessage: playVideo end');
     });
   }

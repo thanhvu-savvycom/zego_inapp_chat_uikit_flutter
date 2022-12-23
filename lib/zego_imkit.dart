@@ -1,5 +1,5 @@
 library zego_imkit;
 
-export 'compnents/compnents.dart';
+export 'compnents/components.dart';
 export 'services/services.dart';
 export 'pages/pages.dart';
