@@ -9,7 +9,19 @@ import 'package:zego_imkit/utils/custom_theme.dart';
 import '../compnents/common/single_tap_detector.dart';
 import 'utils.dart';
 
+const int MAX_SEND_IMAGE_CHAT = 5;
+const int LIMIT_CHAT_IMAGES_IN_MB = 50;
+const int LIMIT_CHAT_VIDEO_IN_MB = 100;
+
 class PickImagesUtils {
+  static String msg_open_image_setting = "Làm ơn mở cài đặt ứng dụng và cho phép truy cập máy ảnh và bộ sưu tập.";
+  static String take_photo = "Chụp ảnh";
+  static String open_gallery = "Chọn trong thư viện";
+  static String cancel = "Huỷ";
+  static String label_pick_image = "Chọn ảnh";
+  static String label_pick_video = "Chọn video";
+  static String label_record_video = "Quay video";
+
   static showAvatarActionSheet(
     BuildContext context, {
     ValueChanged<List<String>>? onResultImagesFromGallery,
@@ -23,13 +35,13 @@ class PickImagesUtils {
                   CupertinoActionSheetAction(
                       onPressed: () async {
                         imagePicker.pickImage(source: ImageSource.camera).then((file) {
-                          if (file != null) {
-                            onResultImageFromCamera?.call(file.path);
+                          if (!isEmpty(file)) {
+                            onResultImageFromCamera?.call(file?.path ?? '');
                           }
                         });
                         Navigator.of(context).pop();
                       },
-                      child: Text("Chụp ảnh",
+                      child: Text(take_photo,
                           style: Theme.of(context).textTheme.subTitle.copyWith(color: actionTextColor))),
                   CupertinoActionSheetAction(
                       onPressed: () async {
@@ -38,26 +50,26 @@ class PickImagesUtils {
                         });
                         Navigator.of(context).pop();
                       },
-                      child: Text("Chọn trong thư viện",
+                      child: Text(open_gallery,
                           style: Theme.of(context).textTheme.subTitle.copyWith(color: actionTextColor)))
                 ],
                 cancelButton: CupertinoActionSheetAction(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text("Huỷ", style: Theme.of(context).textTheme.subTitle.copyWith(color: actionTextColor)),
+                  child: Text(cancel, style: Theme.of(context).textTheme.subTitle.copyWith(color: actionTextColor)),
                 )));
   }
 
   static takePictureFromCamera(
     BuildContext context, {
-    ValueChanged<String>? onResultImageFromCamera,
+    ValueChanged<XFile>? onResultImageFromCamera,
     required ImagePicker imagePicker,
   }) async {
     if (Platform.isIOS && await Permission.camera.isPermanentlyDenied) {
       showPopupYesNoButton(
           context: context,
-          contentText: "Làm ơn mở cài đặt ứng dụng và cho phép truy cập máy ảnh và bộ sưu tập.",
+          contentText: msg_open_image_setting,
           submitCallback: () {
             openAppSettings();
           });
@@ -67,7 +79,7 @@ class PickImagesUtils {
     if (Platform.isAndroid && permission.isPermanentlyDenied) {
       showPopupYesNoButton(
           context: context,
-          contentText: "Làm ơn mở cài đặt ứng dụng và cho phép truy cập máy ảnh và bộ sưu tập.",
+          contentText: msg_open_image_setting,
           submitCallback: () {
             openAppSettings();
           });
@@ -75,16 +87,92 @@ class PickImagesUtils {
     }
     if (permission.isGranted) {
       imagePicker.pickImage(source: ImageSource.camera).then((file) {
-        if (file != null) {
-          onResultImageFromCamera?.call(file.path);
+        if (!isEmpty(file)) {
+          onResultImageFromCamera?.call(file!);
         }
       });
     }
   }
 
-  static takeMultiplePictureFromGallery(
+  static recordVideo(
     BuildContext context, {
-    ValueChanged<List<String>>? onResultImagesFromGallery,
+    ValueChanged<XFile>? onResultRecordVideo,
+    required ImagePicker imagePicker,
+  }) async {
+    if (Platform.isIOS &&
+        (await Permission.camera.isPermanentlyDenied || await Permission.microphone.isPermanentlyDenied)) {
+      showPopupYesNoButton(
+          context: context,
+          contentText: msg_open_image_setting,
+          submitCallback: () {
+            openAppSettings();
+          });
+      return;
+    }
+    var permissionCamera = await Permission.camera.request();
+    var permissionMicro = await Permission.microphone.request();
+    if (Platform.isAndroid && (permissionCamera.isPermanentlyDenied || permissionMicro.isPermanentlyDenied)) {
+      showPopupYesNoButton(
+          context: context,
+          contentText: msg_open_image_setting,
+          submitCallback: () {
+            openAppSettings();
+          });
+      return;
+    }
+    if (permissionCamera.isGranted && permissionMicro.isGranted) {
+      imagePicker
+          .pickVideo(
+              source: ImageSource.camera,
+              maxDuration: const Duration(minutes: 1),
+              preferredCameraDevice: CameraDevice.rear)
+          .then((file) {
+        if (!isEmpty(file)) {
+          onResultRecordVideo?.call(file!);
+        }
+      });
+    }
+  }
+
+  static takeMultiplePictureOrVideoFromGallery(
+    BuildContext context, {
+    ValueChanged<List<XFile>>? onResultImagesFromGallery,
+    ValueChanged<XFile?>? onResultVideoFromGallery,
+    required ImagePicker imagePicker,
+  }) async {
+    showCupertinoModalPopup(
+        context: context,
+        builder: (_) => CupertinoActionSheet(
+                actions: [
+                  CupertinoActionSheetAction(
+                      onPressed: () async {
+                        takeMultiplePictureGallery(context,
+                            imagePicker: imagePicker, onResultImagesFromGallery: onResultImagesFromGallery);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(label_pick_image,
+                          style: Theme.of(context).textTheme.subTitle.copyWith(color: actionTextColor))),
+                  CupertinoActionSheetAction(
+                      onPressed: () async {
+                        takeVideoGallery(context,
+                            imagePicker: imagePicker, onResultVideoFromGallery: onResultVideoFromGallery);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(label_pick_video,
+                          style: Theme.of(context).textTheme.subTitle.copyWith(color: actionTextColor)))
+                ],
+                cancelButton: CupertinoActionSheetAction(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(cancel,
+                      style: Theme.of(context).textTheme.subTitle.copyWith(color: actionTextColor)),
+                )));
+  }
+
+  static takeMultiplePictureGallery(
+    BuildContext context, {
+    ValueChanged<List<XFile>>? onResultImagesFromGallery,
     required ImagePicker imagePicker,
   }) async {
     //ios
@@ -92,7 +180,7 @@ class PickImagesUtils {
         (await Permission.photos.isPermanentlyDenied || await Permission.photosAddOnly.isPermanentlyDenied)) {
       showPopupYesNoButton(
           context: context,
-          contentText: "Làm ơn mở cài đặt ứng dụng và cho phép truy cập máy ảnh và bộ sưu tập.",
+          contentText: msg_open_image_setting,
           submitCallback: () {
             openAppSettings();
           });
@@ -105,7 +193,7 @@ class PickImagesUtils {
     if (Platform.isAndroid && permission.isPermanentlyDenied) {
       showPopupYesNoButton(
           context: context,
-          contentText: "Làm ơn mở cài đặt ứng dụng và cho phép truy cập máy ảnh và bộ sưu tập.",
+          contentText: msg_open_image_setting,
           submitCallback: () {
             openAppSettings();
           });
@@ -119,10 +207,88 @@ class PickImagesUtils {
                 await Permission.photos.request().isLimited ||
                 await Permission.photosAddOnly.request().isLimited))) {
       imagePicker.pickMultiImage().then((files) {
-        onResultImagesFromGallery?.call(files.map((e) => e.path).toList());
+        onResultImagesFromGallery?.call(files);
       });
       return;
     }
+  }
+
+  static takeVideoGallery(
+    BuildContext context, {
+    ValueChanged<XFile?>? onResultVideoFromGallery,
+    required ImagePicker imagePicker,
+  }) async {
+    //ios
+    if (Platform.isIOS &&
+        (await Permission.photos.isPermanentlyDenied || await Permission.photosAddOnly.isPermanentlyDenied)) {
+      showPopupYesNoButton(
+          context: context,
+          contentText: "",
+          submitCallback: () {
+            openAppSettings();
+          });
+      return;
+    }
+
+    var permission = await Permission.storage.request();
+
+    //android
+    if (Platform.isAndroid && permission.isPermanentlyDenied) {
+      showPopupYesNoButton(
+          context: context,
+          contentText: msg_open_image_setting,
+          submitCallback: () {
+            openAppSettings();
+          });
+      return;
+    }
+
+    if ((Platform.isAndroid && permission.isGranted) ||
+        (Platform.isIOS &&
+            (await Permission.photos.request().isGranted ||
+                await Permission.photosAddOnly.request().isGranted ||
+                await Permission.photos.request().isLimited ||
+                await Permission.photosAddOnly.request().isLimited))) {
+      imagePicker.pickVideo(source: ImageSource.gallery).then((files) {
+        onResultVideoFromGallery?.call(files);
+      });
+      return;
+    }
+  }
+
+  static pickCameraOrRecordVideo(
+    BuildContext context, {
+    ValueChanged<XFile>? onResultImageFromCamera,
+    ValueChanged<XFile?>? onResultRecordVideo,
+    required ImagePicker imagePicker,
+  }) async {
+    showCupertinoModalPopup(
+        context: context,
+        builder: (_) => CupertinoActionSheet(
+                actions: [
+                  CupertinoActionSheetAction(
+                      onPressed: () async {
+                        takePictureFromCamera(context,
+                            imagePicker: imagePicker, onResultImageFromCamera: onResultImageFromCamera);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(take_photo,
+                          style: Theme.of(context).textTheme.subTitle.copyWith(color: actionTextColor))),
+                  CupertinoActionSheetAction(
+                      onPressed: () async {
+                        recordVideo(context, imagePicker: imagePicker, onResultRecordVideo: onResultRecordVideo);
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(label_record_video,
+                          style: Theme.of(context).textTheme.subTitle.copyWith(color: actionTextColor)))
+                ],
+                cancelButton: CupertinoActionSheetAction(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(cancel,
+                      style: Theme.of(context).textTheme.subTitle.copyWith(color: actionTextColor)),
+                )));
   }
 
   static Future<bool> isValidSizeOfFiles({required List<XFile> files, required int limitSizeInMB}) async {
@@ -131,6 +297,7 @@ class PickImagesUtils {
       totalSizeInBytes += await file.length();
     }
     double sizeInMB = totalSizeInBytes / (1024 * 1024);
+    print('size of video: $sizeInMB');
     return sizeInMB <= limitSizeInMB;
   }
 
@@ -196,5 +363,11 @@ class PickImagesUtils {
                 )
               ]);
         });
+  }
+
+  static bool isEmpty(Object? text) {
+    if (text is String) return text.isEmpty;
+    if (text is List) return text.isEmpty;
+    return text == null;
   }
 }

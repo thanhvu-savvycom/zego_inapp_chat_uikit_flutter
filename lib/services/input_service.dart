@@ -32,4 +32,27 @@ mixin ZegoInputService {
     // TODO check file limit
     return messageType;
   }
+
+  ZIMMessageType getMessageTypeByFileExtension2(XFile file) {
+    const List<String> supportImageList = ['jpg', 'jpeg', 'png', 'bmp', 'gif', 'tiff']; // <10M
+    const List<String> supportVideoList = ['mp4', 'mov']; // <100M
+    const List<String> supportAudioList = ['mp3', 'm4a']; // <300s, <6M
+
+    ZIMMessageType messageType = ZIMMessageType.file;
+
+    String? ext = extension(file.path);
+    if (supportImageList.contains(ext)) {
+      messageType = ZIMMessageType.image;
+    } else if (supportVideoList.contains(ext)) {
+      messageType = ZIMMessageType.video;
+    } else if (supportAudioList.contains(ext)) {
+      messageType = ZIMMessageType.audio;
+    }
+
+    // TODO check file limit
+    return messageType;
+  }
+
+  String? extension(String path) => path.split('.').last;
+
 }

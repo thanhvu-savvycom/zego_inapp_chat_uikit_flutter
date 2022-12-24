@@ -22,5 +22,6 @@ class PrebuiltChatIconUrls {
   static const String iconSent = 'assets/icons/ic_sent.png';
   static const String iconSending = 'assets/icons/ic_sending.png';
   static const String iconWarning = 'assets/icons/ic_warning.png';
-
+  static const String iconNotification = 'assets/icons/ic_notification.png';
+  static const String iconTickCircle = 'assets/icons/ic_tick_circle.png';
 }

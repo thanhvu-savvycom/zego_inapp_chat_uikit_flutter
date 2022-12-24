@@ -69,16 +69,21 @@ class ZegoIMKitMessageWidget extends StatelessWidget {
             icon = PrebuiltChatIconUrls.iconSending;
           }
           return Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               4.verticalSpace,
               Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   PrebuiltChatImage.asset(icon, width: 12.r, height: 12.r),
-                  Padding(
-                    padding: EdgeInsets.only(left: 6.w),
-                    child: Text(
-                      "Không gửi được tin nhắn",
-                      style: Theme.of(context).textTheme.smallNormal.copyWith(color: danger),
+                  Visibility(
+                    visible: message.sentStatus == ZIMMessageSentStatus.failed,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 6.w),
+                      child: Text(
+                        "Không gửi được tin nhắn",
+                        style: Theme.of(context).textTheme.smallNormal.copyWith(color: danger, height: 1),
+                      ),
                     ),
                   )
                 ],

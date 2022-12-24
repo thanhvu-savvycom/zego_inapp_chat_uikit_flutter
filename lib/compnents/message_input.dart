@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:zego_imkit/utils/toast_util.dart';
 
 import '../services/services.dart';
 import '../utils/custom_theme.dart';
@@ -126,15 +127,29 @@ class _ZegoMessageInputState extends State<ZegoMessageInput> {
               ...buildActions(ZegoMessageInputActionLocation.left),
               SingleTapDetector(
                 onTap: () {
-                  ZegoIMKit().pickFiles().then((files) {
-                    ZegoIMKit().sendMediaMessage(
-                      widget.conversationID,
-                      widget.conversationType,
-                      files,
-                      onMessageSent: widget.onMessageSent,
-                      preMessageSending: widget.preMessageSending,
-                    );
-                  });
+                  PickImagesUtils.pickCameraOrRecordVideo(
+                    context,
+                    imagePicker: imagePicker,
+                    onResultImageFromCamera: (file) {
+                      if (file != null) {
+                        onResultListMedia([file], true);
+                      }
+                    },
+                    onResultRecordVideo: (file) {
+                      if (file != null) {
+                        onResultListMedia([file], false);
+                      }
+                    },
+                  );
+                  // ZegoIMKit().pickFiles().then((files) {
+                  //   ZegoIMKit().sendMediaMessage(
+                  //     widget.conversationID,
+                  //     widget.conversationType,
+                  //     files,
+                  //     onMessageSent: widget.onMessageSent,
+                  //     preMessageSending: widget.preMessageSending,
+                  //   );
+                  // });
                 },
                 child: PrebuiltChatImage.asset(
                   PrebuiltChatIconUrls.iconPickCamera,
@@ -145,15 +160,27 @@ class _ZegoMessageInputState extends State<ZegoMessageInput> {
               20.horizontalSpace,
               SingleTapDetector(
                 onTap: () {
-                  ZegoIMKit().pickFiles().then((files) {
-                    ZegoIMKit().sendMediaMessage(
-                      widget.conversationID,
-                      widget.conversationType,
-                      files,
-                      onMessageSent: widget.onMessageSent,
-                      preMessageSending: widget.preMessageSending,
-                    );
-                  });
+                  PickImagesUtils.takeMultiplePictureOrVideoFromGallery(
+                    context,
+                    imagePicker: imagePicker,
+                    onResultImagesFromGallery: (images) {
+                      onResultListMedia(images, true);
+                    },
+                    onResultVideoFromGallery: (file) {
+                      if (file != null) {
+                        onResultListMedia([file], false);
+                      }
+                    },
+                  );
+                  // ZegoIMKit().pickFiles().then((files) {
+                  //   ZegoIMKit().sendMediaMessage(
+                  //     widget.conversationID,
+                  //     widget.conversationType,
+                  //     files,
+                  //     onMessageSent: widget.onMessageSent,
+                  //     preMessageSending: widget.preMessageSending,
+                  //   );
+                  // });
                 },
                 child: PrebuiltChatImage.asset(
                   PrebuiltChatIconUrls.iconPickGallery,
@@ -285,6 +312,30 @@ class _ZegoMessageInputState extends State<ZegoMessageInput> {
 
   List<Widget> buildActions(ZegoMessageInputActionLocation location) {
     return widget.actions?.where((element) => element.location == location).map((e) => e.child).toList() ?? [];
+  }
+
+  void onResultListMedia(List<XFile> images, bool isImage) async {
+    if (images.isEmpty) return;
+    if (images.length > MAX_SEND_IMAGE_CHAT) {
+      ToastUtil.showToast(context, "Chỉ được tải lên tối đa ${MAX_SEND_IMAGE_CHAT.toString()} ${isImage ? "ảnh" : "video"}!");
+      return;
+    }
+    bool isValidSize =
+    await PickImagesUtils.isValidSizeOfFiles(files: images, limitSizeInMB: LIMIT_CHAT_IMAGES_IN_MB);
+    if (!isValidSize) {
+      ToastUtil.showToast(context, "Tệp vượt quá giới hạn, xin vui lòng thử lại");
+      return;
+    }
+    /*
+    Call api send images
+    */
+    ZegoIMKit().sendMediaMessage2(
+      widget.conversationID,
+      widget.conversationType,
+      images,
+      onMessageSent: widget.onMessageSent,
+      preMessageSending: widget.preMessageSending,
+    );
   }
 }
 

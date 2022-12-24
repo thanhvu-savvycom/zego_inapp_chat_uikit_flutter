@@ -69,6 +69,31 @@ mixin ZegoMessageService {
     }
   }
 
+  Future<void> sendMediaMessage2(
+      String conversationID,
+      ZIMConversationType conversationType,
+      List<XFile> files, {
+        bool audoDetectType = true,
+        ZIMMediaUploadingProgress? mediaUploadingProgress,
+        FutureOr<ZegoIMKitMessage> Function(ZegoIMKitMessage)? preMessageSending,
+        Function(ZegoIMKitMessage)? onMessageSent,
+      }) async {
+    if (kIsWeb) {
+    } else {
+      for (var file in files) {
+        await ZegoIMKitCore.instance.coreData.sendMediaMessage(
+          conversationID,
+          conversationType,
+          file.path,
+          audoDetectType ? ZegoIMKit().getMessageTypeByFileExtension2(file) : ZIMMessageType.file,
+          preMessageSending: preMessageSending,
+          onMessageSent: onMessageSent,
+        );
+      }
+      return;
+    }
+  }
+
   void downloadMediaFile(ZegoIMKitMessage message) {
     return ZegoIMKitCore.instance.coreData.downloadMediaFile(message);
   }

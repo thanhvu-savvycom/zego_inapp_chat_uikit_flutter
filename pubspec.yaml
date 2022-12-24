@@ -37,6 +37,8 @@ dependencies:
   intl: ^0.18.0
   extended_image: ^6.1.0
   grouped_list: ^5.1.2
+  # Toast
+  fluttertoast: ^8.1.1
 
 dev_dependencies:
   flutter_test:

@@ -18,6 +18,21 @@ const Color blue4 = Color(0xFF395390);
 const Color darkRed = Color(0xFFCF2A2A);
 const Color danger = Color(0xFFED1F42);
 const actionTextColor = Color(0xFF24138A);
+const blue1 = Color(0xFF212E4A);
+const dark2 = Color(0xFF313131);
+const natural1 = Color(0xFF1D1D1D);
+const nutural3 = Color(0xFF666666);
+const colorLineGray = Color(0xFFF3F3F3);
+const danger2 = Color(0xFFF14C68);
+const success1 = Color(0xFF15AA2C);
+const blue = Color(0xFF1A73E8);
+const orange = Color(0xFFFF6B00);
+const blueInform = Color(0xFF315BF1);
+const bgInform = Color(0xFFEAEFFE);
+const bgSuccess = Color(0xFFE8F7EA);
+const bgError = Color(0xFFFEECEF);
+const bgWarning = Color(0xFFFFF0E5);
+const neutral2 = Color(0xFF2D2D2D);
 
 extension CustomTheme on TextTheme {
   TextStyle get titleLarge =>
