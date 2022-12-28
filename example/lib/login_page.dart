@@ -1,20 +1,20 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:zego_imkit/zego_imkit.dart';
+import 'package:zego_zimkit/zego_zimkit.dart';
 import 'home_page.dart';
 import 'utils.dart';
 
 final String testRandomUserID = Random().nextInt(10000).toString();
 final String testRandomUserName = randomName();
 
-class ZegoIMKitDemoLoginPage extends StatefulWidget {
-  const ZegoIMKitDemoLoginPage({Key? key}) : super(key: key);
+class ZIMKitDemoLoginPage extends StatefulWidget {
+  const ZIMKitDemoLoginPage({Key? key}) : super(key: key);
 
   @override
-  State<ZegoIMKitDemoLoginPage> createState() => _ZegoIMKitDemoLoginPageState();
+  State<ZIMKitDemoLoginPage> createState() => _ZIMKitDemoLoginPageState();
 }
 
-class _ZegoIMKitDemoLoginPageState extends State<ZegoIMKitDemoLoginPage> {
+class _ZIMKitDemoLoginPageState extends State<ZIMKitDemoLoginPage> {
   /// Users who use the same callID can in the same call.
   final userID = TextEditingController(text: testRandomUserID);
   final userName = TextEditingController(text: testRandomUserName);
@@ -56,12 +56,11 @@ class _ZegoIMKitDemoLoginPageState extends State<ZegoIMKitDemoLoginPage> {
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () async {
-                          await ZegoIMKit()
-                              .login(id: userID.text, name: userName.text);
+                          await ZIMKit().connectUser(
+                              id: userID.text, name: userName.text);
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const ZegoIMKitDemoHomePage(),
+                              builder: (context) => const ZIMKitDemoHomePage(),
                             ),
                           );
                         },

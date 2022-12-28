@@ -1,9 +1,13 @@
-part of 'services.dart';
+import 'dart:async';
 
-mixin ZegoDefaultDialogService {
-  void showDefaultNewChatDialog(
-      {required BuildContext context,
-      required TextEditingController userIDController}) {
+import 'package:flutter/material.dart';
+
+import 'package:zego_zimkit/pages/pages.dart';
+import 'package:zego_zimkit/services/services.dart';
+
+extension ZIMKitDefaultDialogService on ZIMKit {
+  void showDefaultNewPeerChatDialog(BuildContext context) {
+    final userIDController = TextEditingController();
     Timer.run(() {
       showDialog<bool>(
         useRootNavigator: false,
@@ -13,7 +17,6 @@ mixin ZegoDefaultDialogService {
             return AlertDialog(
               title: const Text('New Chat'),
               content: TextField(
-                maxLines: 1,
                 controller: userIDController,
                 keyboardType: TextInputType.text,
                 decoration: const InputDecoration(
@@ -42,9 +45,8 @@ mixin ZegoDefaultDialogService {
         if (ok != true) return;
         if (userIDController.text.isNotEmpty) {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return ZegoMessageListPage(
+            return ZIMKitMessageListPage(
               conversationID: userIDController.text,
-              conversationType: ZIMConversationType.peer,
             );
           }));
         }
@@ -52,11 +54,10 @@ mixin ZegoDefaultDialogService {
     });
   }
 
-  void showDefaultNewGroupDialog({
-    required BuildContext context,
-    required TextEditingController groupNameController,
-    required TextEditingController groupUsersController,
-  }) {
+  void showDefaultNewGroupChatDialog(BuildContext context) {
+    final groupIDController = TextEditingController();
+    final groupNameController = TextEditingController();
+    final groupUsersController = TextEditingController();
     Timer.run(() {
       showDialog<bool>(
         useRootNavigator: false,
@@ -65,32 +66,45 @@ mixin ZegoDefaultDialogService {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
               title: const Text('New Group'),
-              content: Flexible(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextField(
-                      maxLines: 1,
-                      controller: groupNameController,
-                      keyboardType: TextInputType.text,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Group Name',
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: groupNameController,
+                          keyboardType: TextInputType.text,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Group Name',
+                          ),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      maxLines: 3,
-                      controller: groupUsersController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Invite User ID',
-                        hintText: 'separate by comma, e.g. 123,456,789',
+                      Expanded(
+                        child: TextField(
+                          controller: groupIDController,
+                          keyboardType: TextInputType.text,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'ID(optional)',
+                          ),
+                        ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    maxLines: 3,
+                    controller: groupUsersController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Invite User IDs',
+                      hintText: 'separate by comma, e.g. 123,987,229',
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               actions: [
                 TextButton(
@@ -113,13 +127,16 @@ mixin ZegoDefaultDialogService {
         if (ok != true) return;
         if (groupNameController.text.isNotEmpty &&
             groupUsersController.text.isNotEmpty) {
-          ZegoIMKit()
-              .createGroup(groupNameController.text,
-                  groupUsersController.text.split(','))
+          ZIMKit()
+              .createGroup(
+            groupNameController.text,
+            groupUsersController.text.split(','),
+            id: groupIDController.text,
+          )
               .then((String? conversationID) {
             if (conversationID != null) {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return ZegoMessageListPage(
+                return ZIMKitMessageListPage(
                   conversationID: conversationID,
                   conversationType: ZIMConversationType.group,
                 );
@@ -131,10 +148,8 @@ mixin ZegoDefaultDialogService {
     });
   }
 
-  void showDefaultJoinGroupDialog({
-    required BuildContext context,
-    required TextEditingController groupIDController,
-  }) {
+  void showDefaultJoinGroupDialog(BuildContext context) {
+    final groupIDController = TextEditingController();
     Timer.run(() {
       showDialog<bool>(
         useRootNavigator: false,
@@ -143,15 +158,12 @@ mixin ZegoDefaultDialogService {
           return StatefulBuilder(builder: (context, setState) {
             return AlertDialog(
               title: const Text('Join Group'),
-              content: Flexible(
-                child: TextField(
-                  maxLines: 1,
-                  controller: groupIDController,
-                  keyboardType: TextInputType.text,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'Group ID',
-                  ),
+              content: TextField(
+                controller: groupIDController,
+                keyboardType: TextInputType.text,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Group ID',
                 ),
               ),
               actions: [
@@ -174,10 +186,10 @@ mixin ZegoDefaultDialogService {
       ).then((bool? ok) {
         if (ok != true) return;
         if (groupIDController.text.isNotEmpty) {
-          ZegoIMKit().joinGroup(groupIDController.text).then((int errorCode) {
+          ZIMKit().joinGroup(groupIDController.text).then((int errorCode) {
             if (errorCode == 0) {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return ZegoMessageListPage(
+                return ZIMKitMessageListPage(
                   conversationID: groupIDController.text,
                   conversationType: ZIMConversationType.group,
                 );

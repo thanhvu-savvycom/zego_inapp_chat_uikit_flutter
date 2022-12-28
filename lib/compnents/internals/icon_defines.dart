@@ -5,7 +5,7 @@ class PrebuiltChatImage {
   static Image asset(String name, {double? height, double? width, Color? color}) {
     return Image.asset(
       name,
-      package: "zego_imkit",
+      package: "zego_zimkit",
       height: height,
       width: width,
       color: color,

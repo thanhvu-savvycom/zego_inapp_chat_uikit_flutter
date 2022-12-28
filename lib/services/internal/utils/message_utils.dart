@@ -1,7 +1,8 @@
-import '../services/services.dart';
+import 'package:zego_zimkit/services/services.dart';
 
-class ZegoMessageUtils {
-  static ZIMMediaMessage mediaMessageFactory(String path, ZIMMessageType messageType) {
+class ZIMKitMessageUtils {
+  static ZIMMediaMessage mediaMessageFactory(
+      String path, ZIMMessageType messageType) {
     ZIMMediaMessage mediaMessage;
 
     switch (messageType) {

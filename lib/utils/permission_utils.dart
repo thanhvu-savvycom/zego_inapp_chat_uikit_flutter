@@ -10,7 +10,7 @@ Future<bool> zegoIMKitRequestPermission(Permission permission) async {
   }
   var status = await permission.request();
   if (status != PermissionStatus.granted) {
-    ZegoIMKitLogger.severe('Error: ${permission.toString()} permission not granted, $status');
+    ZIMKitLogger.severe('Error: ${permission.toString()} permission not granted, $status');
     return false;
   }
 

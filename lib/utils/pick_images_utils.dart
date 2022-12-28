@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:zego_imkit/utils/custom_theme.dart';
+import 'package:zego_zimkit/utils/custom_theme.dart';
 import '../compnents/common/single_tap_detector.dart';
 import 'utils.dart';
 

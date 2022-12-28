@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:zego_imkit/compnents/internals/icon_defines.dart';
-import 'package:zego_imkit/services/services.dart';
-import 'package:zego_imkit/utils/custom_theme.dart';
+import 'package:zego_zimkit/compnents/internals/icon_defines.dart';
+import 'package:zego_zimkit/services/services.dart';
+import 'package:zego_zimkit/utils/custom_theme.dart';
 
 import '../common/common.dart';
 import 'audio_message.dart';
@@ -17,8 +17,8 @@ export 'audio_message.dart';
 export 'text_message.dart';
 export 'video_message.dart';
 
-class ZegoIMKitMessageWidget extends StatelessWidget {
-  const ZegoIMKitMessageWidget({
+class ZIMKitMessageWidget extends StatelessWidget {
+  const ZIMKitMessageWidget({
     Key? key,
     required this.message,
     this.onPressed,
@@ -26,36 +26,39 @@ class ZegoIMKitMessageWidget extends StatelessWidget {
     this.statusBuilder,
     this.avatarBuilder,
     this.timestampBuilder,
+    this.isSameUserPreviousMsg = false,
+    this.isSameUserNextMsg = false,
   }) : super(key: key);
 
-  final ZegoIMKitMessage message;
-  final Widget Function(BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)? avatarBuilder;
-  final Widget Function(BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)? statusBuilder;
-  final Widget Function(BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)? timestampBuilder;
-  final void Function(BuildContext context, ZegoIMKitMessage message, Function defaultAction)? onPressed;
-  final void Function(BuildContext context, ZegoIMKitMessage message, Function defaultAction)? onLongPress;
+  final ZIMKitMessage message;
+  final Widget Function(BuildContext context, ZIMKitMessage message, Widget defaultWidget)? avatarBuilder;
+  final Widget Function(BuildContext context, ZIMKitMessage message, Widget defaultWidget)? statusBuilder;
+  final Widget Function(BuildContext context, ZIMKitMessage message, Widget defaultWidget)? timestampBuilder;
+  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onPressed;
+  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onLongPress;
+  final bool isSameUserPreviousMsg, isSameUserNextMsg;
 
   // TODO default onPressed onLongPress action
   // TODO custom meesage
-  Widget buildMessage(BuildContext context, ZegoIMKitMessage message) {
+  Widget buildMessage(BuildContext context, ZIMKitMessage message) {
     switch (message.data.value.type) {
       case ZIMMessageType.text:
-        return ZegoTextMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZIMKitTextMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.audio:
-        return ZegoAudioMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZIMKitAudioMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.video:
-        return ZegoVideoMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZIMKitVideoMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.file:
-        return ZegoFileMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZIMKitFileMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.image:
-        return ZegoImageMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZIMKitImageMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
 
       default:
         return Text(message.data.value.type.toString());
     }
   }
 
-  Widget buildStatus(BuildContext context, ZegoIMKitMessage message) {
+  Widget buildStatus(BuildContext context, ZIMKitMessage message) {
     // Widget defaultStatusWidget = ZegoMessageStatusDot(message);
     Widget defaultStatusWidget = ValueListenableBuilder<ZIMMessage>(
         valueListenable: message.data,
@@ -82,7 +85,11 @@ class ZegoIMKitMessageWidget extends StatelessWidget {
                       padding: EdgeInsets.only(left: 6.w),
                       child: Text(
                         "Không gửi được tin nhắn",
-                        style: Theme.of(context).textTheme.smallNormal.copyWith(color: danger, height: 1),
+                        style: Theme
+                            .of(context)
+                            .textTheme
+                            .smallNormal
+                            .copyWith(color: danger, height: 1),
                       ),
                     ),
                   )
@@ -94,15 +101,15 @@ class ZegoIMKitMessageWidget extends StatelessWidget {
     return statusBuilder?.call(context, message, defaultStatusWidget) ?? defaultStatusWidget;
   }
 
-  Widget buildAvatar(BuildContext context, ZegoIMKitMessage message) {
+  Widget buildAvatar(BuildContext context, ZIMKitMessage message) {
     Widget defaultAvatarWidget = Padding(
       padding: EdgeInsets.only(right: 12.w),
-      child: ZegoIMKitAvatar(userID: message.senderUserID),
+      child: ZIMKitAvatar(userID: message.senderUserID),
     );
     return avatarBuilder?.call(context, message, defaultAvatarWidget) ?? defaultAvatarWidget;
   }
 
-  Widget buildTime(BuildContext context, ZegoIMKitMessage message) {
+  Widget buildTime(BuildContext context, ZIMKitMessage message) {
     return ValueListenableBuilder<ZIMMessage>(
         valueListenable: message.data,
         builder: (context, ZIMMessage message, child) {
@@ -110,14 +117,18 @@ class ZegoIMKitMessageWidget extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 7.w),
               child: Text(
                 DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(message.timestamp)),
-                style: Theme.of(context).textTheme.smallNormal.copyWith(color: dark7),
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .smallNormal
+                    .copyWith(color: dark7),
               ));
         });
   }
 
   // TODO how to custom layout
   // TODO timestamp
-  Widget localMessage(BuildContext context, ZegoIMKitMessage message) {
+  Widget localMessage(BuildContext context, ZIMKitMessage message) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -132,12 +143,14 @@ class ZegoIMKitMessageWidget extends StatelessWidget {
           ],
         ),
         // buildAvatar(context, message),
-        buildStatus(context, message),
+        Visibility(
+            visible: !isSameUserNextMsg,
+            child: buildStatus(context, message)),
       ],
     );
   }
 
-  Widget remoteMessage(BuildContext context, ZegoIMKitMessage message) {
+  Widget remoteMessage(BuildContext context, ZIMKitMessage message) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.start,

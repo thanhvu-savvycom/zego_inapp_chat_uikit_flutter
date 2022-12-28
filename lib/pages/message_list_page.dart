@@ -3,31 +3,32 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:zego_imkit/utils/custom_theme.dart';
-import 'package:zego_imkit/zego_imkit.dart';
 
-class ZegoMessageListPage extends StatelessWidget {
-  const ZegoMessageListPage({
-    Key? key,
-    required this.conversationID,
-    this.conversationType = ZIMConversationType.peer,
-    this.appBarBuilder,
-    this.appBarActions,
-    this.messageInputActions,
-    this.onMessageSent,
-    this.preMessageSending,
-    this.inputDecoration,
-    this.showPickFileButton = true,
-    this.editingController,
-    this.messageListScrollController,
-    this.onMessageItemPressd,
-    this.onMessageItemLongPress,
-    this.messageItemBuilder,
-    this.messageListErrorBuilder,
-    this.messageListLoadingBuilder,
-    this.theme,
-    this.appName
-  }) : super(key: key);
+import 'package:zego_zimkit/utils/custom_theme.dart';
+import 'package:zego_zimkit/zego_zimkit.dart';
+
+class ZIMKitMessageListPage extends StatelessWidget {
+  const ZIMKitMessageListPage(
+      {Key? key,
+      required this.conversationID,
+      this.conversationType = ZIMConversationType.peer,
+      this.appBarBuilder,
+      this.appBarActions,
+      this.messageInputActions,
+      this.onMessageSent,
+      this.preMessageSending,
+      this.inputDecoration,
+      this.showPickFileButton = true,
+      this.editingController,
+      this.messageListScrollController,
+      this.onMessageItemPressd,
+      this.onMessageItemLongPress,
+      this.messageItemBuilder,
+      this.messageListErrorBuilder,
+      this.messageListLoadingBuilder,
+      this.theme,
+      this.appName})
+      : super(key: key);
 
   /// this page's conversationID
   final String conversationID;
@@ -53,43 +54,45 @@ class ZegoMessageListPage extends StatelessWidget {
   /// use [messageInputActions] like this to add your custom actions:
   ///
   /// actions: [
-  ///   ZegoMessageInputAction.left(
+  ///   ZIMKitMessageInputAction.left(
   ///     IconButton(icon: Icon(Icons.mic), onPressed: () {})
   ///   ),
-  ///   ZegoMessageInputAction.leftInside(
+  ///   ZIMKitMessageInputAction.leftInside(
   ///     IconButton(icon: Icon(Icons.sentiment_satisfied_alt_outlined), onPressed: () {})
   ///   ),
-  ///   ZegoMessageInputAction.rightInside(
+  ///   ZIMKitMessageInputAction.rightInside(
   ///     IconButton(icon: Icon(Icons.cabin), onPressed: () {})
   ///   ),
-  ///   ZegoMessageInputAction.right(
+  ///   ZIMKitMessageInputAction.right(
   ///     IconButton(icon: Icon(Icons.sd), onPressed: () {})
   ///   ),
   /// ],
-  final List<ZegoMessageInputAction>? messageInputActions;
+  final List<ZIMKitMessageInputAction>? messageInputActions;
 
   /// Called when a message is sent.
-  final void Function(ZegoIMKitMessage)? onMessageSent;
+  final void Function(ZIMKitMessage)? onMessageSent;
 
   /// Called before a message is sent.
-  final FutureOr<ZegoIMKitMessage> Function(ZegoIMKitMessage)? preMessageSending;
+  final FutureOr<ZIMKitMessage> Function(ZIMKitMessage)? preMessageSending;
 
-  /// By default, [ZegoMessageInput] will show a button to pick file.
+  /// By default, [ZIMKitMessageInput] will show a button to pick file.
   /// If you don't want to show this button, set [showPickFileButton] to false.
   final bool showPickFileButton;
 
   /// The TextField's decoration.
   final InputDecoration? inputDecoration;
 
-  /// The [TextEditingController] to use. if not provided, a default one will be created.
+  /// The [TextEditingController] to use.
+  /// if not provided, a default one will be created.
   final TextEditingController? editingController;
 
-  /// The [ScrollController] to use. if not provided, a default one will be created.
+  /// The [ScrollController] to use.
+  /// if not provided, a default one will be created.
   final ScrollController? messageListScrollController;
 
-  final void Function(BuildContext context, ZegoIMKitMessage message, Function defaultAction)? onMessageItemPressd;
-  final void Function(BuildContext context, ZegoIMKitMessage message, Function defaultAction)? onMessageItemLongPress;
-  final Widget Function(BuildContext context, ZegoIMKitMessage message, Widget defaultWidget)? messageItemBuilder;
+  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onMessageItemPressd;
+  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onMessageItemLongPress;
+  final Widget Function(BuildContext context, ZIMKitMessage message, Widget defaultWidget)? messageItemBuilder;
   final Widget Function(BuildContext context, Widget defaultWidget)? messageListErrorBuilder;
   final Widget Function(BuildContext context, Widget defaultWidget)? messageListLoadingBuilder;
 
@@ -107,7 +110,7 @@ class ZegoMessageListPage extends StatelessWidget {
           return Theme(
               data: theme ?? Theme.of(context),
               child: ValueListenableBuilder(
-                  valueListenable: ZegoIMKit().getConversation(conversationID, conversationType).data,
+                  valueListenable: ZIMKit().getConversation(conversationID, conversationType).data,
                   builder: (context, ZIMConversation conversation, child) {
                     return Scaffold(
                         appBar: appBarBuilder != null
@@ -117,23 +120,26 @@ class ZegoMessageListPage extends StatelessWidget {
                             alignment: Alignment.center,
                             child: Column(
                               children: [
-                                conversation.lastMessage != null
-                                    ? ZegoMessageListView(
-                                        conversationID: conversationID,
-                                        conversationType: conversationType,
-                                        onPressed: onMessageItemPressd,
-                                        itemBuilder: messageItemBuilder,
-                                        onLongPress: onMessageItemLongPress,
-                                        loadingBuilder: messageListLoadingBuilder,
-                                        errorBuilder: messageListErrorBuilder,
-                                        scrollController: messageListScrollController,
-                                        theme: theme,
-                                      )
-                                    : Text(
-                                        "Gửi tin nhắn đến chuyên gia của chúng tôi để nhận tư vấn nhé!",
-                                        style: Theme.of(context).textTheme.body1.copyWith(color: dark6),
-                                      ),
-                                ZegoMessageInput(
+                                ZIMKitMessageListView(
+                                  key: ValueKey('ZIMKitMessageListView:${Object.hash(
+                                    conversationID,
+                                    conversationType,
+                                  )}'),
+                                  conversationID: conversationID,
+                                  conversationType: conversationType,
+                                  onPressed: onMessageItemPressd,
+                                  itemBuilder: messageItemBuilder,
+                                  onLongPress: onMessageItemLongPress,
+                                  loadingBuilder: messageListLoadingBuilder,
+                                  errorBuilder: messageListErrorBuilder,
+                                  scrollController: messageListScrollController,
+                                  theme: theme,
+                                ),
+                                ZIMKitMessageInput(
+                                  key: ValueKey('ZIMKitMessageInput:${Object.hash(
+                                    conversationID,
+                                    conversationType,
+                                  )}'),
                                   conversationID: conversationID,
                                   conversationType: conversationType,
                                   actions: messageInputActions,
@@ -173,7 +179,7 @@ class ZegoMessageListPage extends StatelessWidget {
           : null),
       // iconTheme: IconThemeData(color: iconColor ?? R.color.black),
       title: Text(
-        ZegoIMKit().getConversation(conversationID, conversationType).name,
+        ZIMKit().getConversation(conversationID, conversationType).name,
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.h5Bold,
       ),

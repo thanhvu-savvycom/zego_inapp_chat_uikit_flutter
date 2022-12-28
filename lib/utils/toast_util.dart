@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:zego_imkit/compnents/internals/icon_defines.dart';
-import 'package:zego_imkit/utils/custom_theme.dart';
+import 'package:zego_zimkit/compnents/internals/icon_defines.dart';
+import 'package:zego_zimkit/utils/custom_theme.dart';
 
 enum ToastType { SUCCESS, WARNING, ERROR, INFORM }
 
@@ -42,7 +42,7 @@ class ToastUtil {
           children: [
             isPrefixIcon == true
                 ? Container(
-                    margin: EdgeInsets.only(right: 10.w), child: Image.asset(iconData, height: 24.h, color: iconColor))
+                    margin: EdgeInsets.only(right: 10.w), child: PrebuiltChatImage.asset(iconData, height: 24.h, color: iconColor))
                 : Container(),
             Expanded(
               child: Text(text ?? "", style: Theme.of(context).textTheme.subTitle.copyWith(color: textColor)),

@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
 
-import 'package:zego_imkit/services/services.dart';
+import 'package:zego_zimkit/compnents/messages/video_message_player.dart';
+import 'package:zego_zimkit/compnents/messages/video_message_preview.dart';
+import 'package:zego_zimkit/services/services.dart';
 
-import 'video_message_player.dart';
-import 'video_message_preview.dart';
-
-class ZegoVideoMessage extends StatelessWidget {
-  const ZegoVideoMessage({
+class ZIMKitVideoMessage extends StatelessWidget {
+  const ZIMKitVideoMessage({
     Key? key,
     required this.message,
     this.onPressed,
     this.onLongPress,
   }) : super(key: key);
 
-  final ZegoIMKitMessage message;
-  final void Function(BuildContext context, ZegoIMKitMessage message,
-      Function defaultAction)? onPressed;
-  final void Function(BuildContext context, ZegoIMKitMessage message,
-      Function defaultAction)? onLongPress;
+  final ZIMKitMessage message;
+  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onPressed;
+  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onLongPress;
 
   void _onPressed(BuildContext context) {
-    defaultAction() => playVideo(context);
+    void defaultAction() => playVideo(context);
     if (onPressed != null) {
       onPressed!.call(context, message, defaultAction);
     } else {
@@ -29,7 +26,7 @@ class ZegoVideoMessage extends StatelessWidget {
   }
 
   void _onLongPress(BuildContext context) {
-    defaultAction() {}
+    void defaultAction() {}
     if (onLongPress != null) {
       onLongPress!.call(context, message, defaultAction);
     } else {
@@ -46,7 +43,7 @@ class ZegoVideoMessage extends StatelessWidget {
           child: GestureDetector(
             onTap: () => _onPressed(context),
             onLongPress: () => _onLongPress(context),
-            child: ZegoVideoMessagePreview(message),
+            child: ZIMKitVideoMessagePreview(message),
           ),
         );
       },
@@ -54,8 +51,12 @@ class ZegoVideoMessage extends StatelessWidget {
   }
 
   void playVideo(BuildContext context) {
-    Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(builder: (context) => ZegoVideoMessagePlayer(message),)).then((value) {
-      ZegoIMKitLogger.fine('ZegoVideoMessage: playVideo end');
+    Navigator.of(context, rootNavigator: true)
+        .push(MaterialPageRoute(
+      builder: (context) => ZIMKitVideoMessagePlayer(message),
+    ))
+        .then((value) {
+      ZIMKitLogger.fine('ZIMKitVideoMessage: playVideo end');
     });
   }
 }

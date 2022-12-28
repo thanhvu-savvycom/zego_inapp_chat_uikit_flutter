@@ -7,20 +7,21 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:zego_imkit/compnents/common/single_tap_detector.dart';
-import 'package:zego_imkit/services/services.dart';
-import 'package:zego_imkit/utils/custom_theme.dart';
+import 'package:zego_zimkit/compnents/common/single_tap_detector.dart';
+import 'package:zego_zimkit/services/defines.dart';
+import 'package:zego_zimkit/utils/custom_theme.dart';
 
-class ZegoVideoMessagePlayer extends StatefulWidget {
-  const ZegoVideoMessagePlayer(this.message, {Key? key}) : super(key: key);
+class ZIMKitVideoMessagePlayer extends StatefulWidget {
+  const ZIMKitVideoMessagePlayer(this.message, {Key? key}) : super(key: key);
 
-  final ZegoIMKitMessage message;
+  final ZIMKitMessage message;
 
   @override
-  State<ZegoVideoMessagePlayer> createState() => ZegoVideoMessagePlayerState();
+  State<ZIMKitVideoMessagePlayer> createState() =>
+      ZIMKitVideoMessagePlayerState();
 }
 
-class ZegoVideoMessagePlayerState extends State<ZegoVideoMessagePlayer> {
+class ZIMKitVideoMessagePlayerState extends State<ZIMKitVideoMessagePlayer> {
   BetterPlayerController? _betterPlayerController;
   YoutubePlayerController? _youtubeController;
   String? youtubeId;

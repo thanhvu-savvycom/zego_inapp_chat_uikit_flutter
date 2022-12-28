@@ -2,28 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:zego_imkit/compnents/internals/icon_defines.dart';
-import 'package:zego_imkit/services/services.dart';
-import 'package:zego_imkit/utils/custom_theme.dart';
+import 'package:zego_zimkit/compnents/internals/icon_defines.dart';
 
-class ZegoTextMessage extends StatelessWidget {
-  const ZegoTextMessage({
+import 'package:zego_zimkit/services/services.dart';
+import 'package:zego_zimkit/utils/custom_theme.dart';
+
+class ZIMKitTextMessage extends StatelessWidget {
+  const ZIMKitTextMessage({
     Key? key,
     required this.message,
     this.onPressed,
     this.onLongPress,
   }) : super(key: key);
 
-  final ZegoIMKitMessage message;
-  final void Function(BuildContext context, ZegoIMKitMessage message, Function defaultAction)? onPressed;
-  final void Function(BuildContext context, ZegoIMKitMessage message, Function defaultAction)? onLongPress;
+  final ZIMKitMessage message;
+  final void Function(
+          BuildContext context, ZIMKitMessage message, Function defaultAction)?
+      onPressed;
+  final void Function(
+          BuildContext context, ZIMKitMessage message, Function defaultAction)?
+      onLongPress;
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<ZIMMessage>(
       valueListenable: message.data,
       builder: (context, ZIMMessage msg, child) {
-        ZIMTextMessage message = msg as ZIMTextMessage;
+        final message = msg as ZIMTextMessage;
         return Flexible(
           child: GestureDetector(
               onTap: () => onPressed?.call(context, this.message, () {}),

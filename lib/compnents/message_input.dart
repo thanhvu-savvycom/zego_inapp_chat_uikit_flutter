@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:zego_imkit/utils/toast_util.dart';
+import 'package:zego_zimkit/utils/toast_util.dart';
 
 import '../services/services.dart';
 import '../utils/custom_theme.dart';
@@ -11,21 +11,23 @@ import '../utils/pick_images_utils.dart';
 import 'common/single_tap_detector.dart';
 import 'internals/icon_defines.dart';
 import 'messages/widgets/widgets.dart';
+import 'package:zego_zimkit/compnents/messages/widgets/widgets.dart';
+import 'package:zego_zimkit/services/services.dart';
 
-class ZegoMessageInput extends StatefulWidget {
-  const ZegoMessageInput(
-      {Key? key,
-      required this.conversationID,
-      this.conversationType = ZIMConversationType.peer,
-      this.onMessageSent,
-      this.preMessageSending,
-      this.editingController,
-      this.showPickFileButton = true,
-      this.actions = const [],
-      this.inputDecoration,
-      this.theme,
-      this.appName})
-      : super(key: key);
+class ZIMKitMessageInput extends StatefulWidget {
+  const ZIMKitMessageInput({
+    Key? key,
+    required this.conversationID,
+    this.conversationType = ZIMConversationType.peer,
+    this.onMessageSent,
+    this.preMessageSending,
+    this.editingController,
+    this.showPickFileButton = true,
+    this.actions = const [],
+    this.inputDecoration,
+    this.theme,
+    this.appName
+  }) : super(key: key);
 
   /// The conversationID of the conversation to send message.
   final String conversationID;
@@ -42,28 +44,28 @@ class ZegoMessageInput extends StatefulWidget {
   /// use [actions] like this to add your custom actions:
   ///
   /// actions: [
-  ///   ZegoMessageInputAction.left(IconButton(
+  ///   ZIMKitMessageInputAction.left(IconButton(
   ///     icon: Icon(
   ///       Icons.mic,
   ///       color: Theme.of(context).textTheme.bodyText1!.color!.withOpacity(0.64),
   ///     ),
   ///     onPressed: () {},
   ///   )),
-  ///   ZegoMessageInputAction.leftInside(IconButton(
+  ///   ZIMKitMessageInputAction.leftInside(IconButton(
   ///     icon: Icon(
   ///       Icons.sentiment_satisfied_alt_outlined,
   ///       color: Theme.of(context).textTheme.bodyText1!.color!.withOpacity(0.64),
   ///     ),
   ///     onPressed: () {},
   ///   )),
-  ///   ZegoMessageInputAction.rightInside(IconButton(
+  ///   ZIMKitMessageInputAction.rightInside(IconButton(
   ///     icon: Icon(
   ///       Icons.cabin,
   ///       color: Theme.of(context).textTheme.bodyText1!.color!.withOpacity(0.64),
   ///     ),
   ///     onPressed: () {},
   ///   )),
-  ///   ZegoMessageInputAction.right(IconButton(
+  ///   ZIMKitMessageInputAction.right(IconButton(
   ///     icon: Icon(
   ///       Icons.sd,
   ///       color: Theme.of(context).textTheme.bodyText1!.color!.withOpacity(0.64),
@@ -71,13 +73,13 @@ class ZegoMessageInput extends StatefulWidget {
   ///     onPressed: () {},
   ///   )),
   /// ],
-  final List<ZegoMessageInputAction>? actions;
+  final List<ZIMKitMessageInputAction>? actions;
 
   /// Called when a message is sent.
-  final void Function(ZegoIMKitMessage)? onMessageSent;
+  final void Function(ZIMKitMessage)? onMessageSent;
 
   /// Called before a message is sent.
-  final FutureOr<ZegoIMKitMessage> Function(ZegoIMKitMessage)? preMessageSending;
+  final FutureOr<ZIMKitMessage> Function(ZIMKitMessage)? preMessageSending;
 
   /// The TextField's decoration.
   final InputDecoration? inputDecoration;
@@ -91,14 +93,15 @@ class ZegoMessageInput extends StatefulWidget {
   final String? appName;
 
   @override
-  State<ZegoMessageInput> createState() => _ZegoMessageInputState();
+  State<ZIMKitMessageInput> createState() => _ZIMKitMessageInputState();
 }
 
-class _ZegoMessageInputState extends State<ZegoMessageInput> {
+class _ZIMKitMessageInputState extends State<ZIMKitMessageInput> {
   // TODO RestorableTextEditingController
-  final TextEditingController _defaultEditingController = TextEditingController();
-
-  TextEditingController get _editingController => widget.editingController ?? _defaultEditingController;
+  final TextEditingController _defaultEditingController =
+      TextEditingController();
+  TextEditingController get _editingController =>
+      widget.editingController ?? _defaultEditingController;
 
   final ValueNotifier<bool> isTyping = ValueNotifier(false);
 
@@ -122,9 +125,9 @@ class _ZegoMessageInputState extends State<ZegoMessageInput> {
             ),
         child: SafeArea(
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ...buildActions(ZegoMessageInputActionLocation.left),
+              ...buildActions(ZIMKitMessageInputActionLocation.left),
               SingleTapDetector(
                 onTap: () {
                   PickImagesUtils.pickCameraOrRecordVideo(
@@ -191,9 +194,9 @@ class _ZegoMessageInputState extends State<ZegoMessageInput> {
               18.horizontalSpace,
               Expanded(
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    ...buildActions(ZegoMessageInputActionLocation.leftInside),
+                    ...buildActions(ZIMKitMessageInputActionLocation.leftInside),
                     Expanded(
                       child: TextField(
                         onSubmitted: (value) => sendTextMessage(),
@@ -288,7 +291,7 @@ class _ZegoMessageInputState extends State<ZegoMessageInput> {
                   );
                 },
               ),
-              ...buildActions(ZegoMessageInputActionLocation.right),
+              ...buildActions(ZIMKitMessageInputActionLocation.right),
             ],
           ),
         ),
@@ -297,7 +300,7 @@ class _ZegoMessageInputState extends State<ZegoMessageInput> {
   }
 
   Future<void> sendTextMessage() async {
-    ZegoIMKit().sendTextMessage(
+    ZIMKit().sendTextMessage(
       widget.conversationID,
       widget.conversationType,
       _editingController.text,
@@ -310,7 +313,7 @@ class _ZegoMessageInputState extends State<ZegoMessageInput> {
     // TODO mobile auto focus or not
   }
 
-  List<Widget> buildActions(ZegoMessageInputActionLocation location) {
+  List<Widget> buildActions(ZIMKitMessageInputActionLocation location) {
     return widget.actions?.where((element) => element.location == location).map((e) => e.child).toList() ?? [];
   }
 
@@ -329,7 +332,7 @@ class _ZegoMessageInputState extends State<ZegoMessageInput> {
     /*
     Call api send images
     */
-    ZegoIMKit().sendMediaMessage2(
+    ZIMKit().sendMediaMessage2(
       widget.conversationID,
       widget.conversationType,
       images,
@@ -339,19 +342,20 @@ class _ZegoMessageInputState extends State<ZegoMessageInput> {
   }
 }
 
-enum ZegoMessageInputActionLocation { left, right, leftInside, rightInside }
+enum ZIMKitMessageInputActionLocation { left, right, leftInside, rightInside }
 
-class ZegoMessageInputAction {
-  const ZegoMessageInputAction.left(Widget child) : this(child, ZegoMessageInputActionLocation.left);
-
-  const ZegoMessageInputAction.right(Widget child) : this(child, ZegoMessageInputActionLocation.right);
-
-  const ZegoMessageInputAction.leftInside(Widget child) : this(child, ZegoMessageInputActionLocation.leftInside);
-
-  const ZegoMessageInputAction.rightInside(Widget child) : this(child, ZegoMessageInputActionLocation.rightInside);
-
-  const ZegoMessageInputAction(this.child, [this.location = ZegoMessageInputActionLocation.rightInside]);
+class ZIMKitMessageInputAction {
+  const ZIMKitMessageInputAction(this.child,
+      [this.location = ZIMKitMessageInputActionLocation.rightInside]);
+  const ZIMKitMessageInputAction.left(Widget child)
+      : this(child, ZIMKitMessageInputActionLocation.left);
+  const ZIMKitMessageInputAction.right(Widget child)
+      : this(child, ZIMKitMessageInputActionLocation.right);
+  const ZIMKitMessageInputAction.leftInside(Widget child)
+      : this(child, ZIMKitMessageInputActionLocation.leftInside);
+  const ZIMKitMessageInputAction.rightInside(Widget child)
+      : this(child, ZIMKitMessageInputActionLocation.rightInside);
 
   final Widget child;
-  final ZegoMessageInputActionLocation location;
+  final ZIMKitMessageInputActionLocation location;
 }

@@ -1,4 +1,4 @@
-name: zego_imkit
+name: zego_zimkit
 description: zego imkit.
 version: 0.0.1
 homepage: https://www.zegocloud.com/
@@ -43,8 +43,12 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^1.0.0
+  dart_code_metrics: any
+  flutter_lints: any
+  import_sorter: any
 
+import_sorter:
+  comments: false
 
 flutter:
   uses-material-design: true

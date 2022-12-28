@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:zego_imkit/services/services.dart';
+import 'package:zego_zimkit/zego_zimkit.dart';
 
 import '../internals/icon_defines.dart';
 
-class ZegoIMKitAvatar extends StatelessWidget {
-  const ZegoIMKitAvatar(
+class ZIMKitAvatar extends StatelessWidget {
+  const ZIMKitAvatar(
       {Key? key, required this.userID, this.height, this.width})
       : super(key: key);
   final String userID;
@@ -24,10 +24,10 @@ class ZegoIMKitAvatar extends StatelessWidget {
           height: height ?? 32.r,
           child: FutureBuilder(
             // TODO auto update user's avatar
-            future: ZegoIMKit().queryUser(userID),
+            future: ZIMKit().queryUser(userID),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return (snapshot.data as ZIMUserFullInfo).icon(width: width, height: height);
+                return (snapshot.data as ZIMUserFullInfo).icon;
               } else {
                 return PrebuiltChatImage.asset(
                     PrebuiltChatIconUrls.iconAvatar, width: width, height: height);
