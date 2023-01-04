@@ -7,6 +7,8 @@ import 'package:zego_zimkit/compnents/internals/icon_defines.dart';
 import 'package:zego_zimkit/services/services.dart';
 import 'package:zego_zimkit/utils/custom_theme.dart';
 
+import '../../utils/linkwell.dart';
+
 class ZIMKitTextMessage extends StatelessWidget {
   const ZIMKitTextMessage({
     Key? key,
@@ -16,12 +18,8 @@ class ZIMKitTextMessage extends StatelessWidget {
   }) : super(key: key);
 
   final ZIMKitMessage message;
-  final void Function(
-          BuildContext context, ZIMKitMessage message, Function defaultAction)?
-      onPressed;
-  final void Function(
-          BuildContext context, ZIMKitMessage message, Function defaultAction)?
-      onLongPress;
+  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onPressed;
+  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -36,15 +34,16 @@ class ZIMKitTextMessage extends StatelessWidget {
                     Clipboard.setData(ClipboardData(text: message.message));
                   }),
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
                 decoration: BoxDecoration(
                   color: message.isSender ? blue4 : neutral7,
                   borderRadius: BorderRadius.all(Radius.circular(16.r)),
                 ),
-                child: Text(
+                child: LinkWell(
                   message.message,
-                  style: Theme.of(context).textTheme.body1.copyWith(color: message.isSender ? white : dark1),
+                  style: Theme.of(context).textTheme.body1.copyWith(color: message.isSender ? white : dark1, height: 1),
                   textAlign: message.isSender ? TextAlign.right : TextAlign.left,
+                  linkStyle: Theme.of(context).textTheme.body1.copyWith(color: message.isSender ? white : blue, decoration: TextDecoration.underline, height: 1),
                 ),
               )
               // Container(

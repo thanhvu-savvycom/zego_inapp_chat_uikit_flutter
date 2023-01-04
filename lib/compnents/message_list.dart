@@ -91,96 +91,94 @@ class _ZIMKitMessageListViewState extends State<ZIMKitMessageListView> {
   Widget build(BuildContext context) {
     return Theme(
       data: widget.theme ?? Theme.of(context).copyWith(backgroundColor: white),
-      child: Expanded(
-        child: FutureBuilder(
-          future: ZIMKit().getMessageListNotifier(
-              widget.conversationID, widget.conversationType),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ValueListenableBuilder(
-                valueListenable:
-                    snapshot.data! as ValueNotifier<List<ZIMKitMessage>>,
-                builder: (BuildContext context, List<ZIMKitMessage> messageList,
-                    Widget? child) {
-                  ZIMKit().clearUnreadCount(
-                      widget.conversationID, widget.conversationType);
-                  if (messageList.isEmpty) {
-                    return Container(
-                      alignment: Alignment.center,
-                      margin: EdgeInsets.symmetric(horizontal: 50.w),
-                      child: Text(
-                        "Gửi tin nhắn đến chuyên gia của chúng tôi để nhận tư vấn nhé!",
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.body1.copyWith(color: dark6),
-                      ),
-                    );
-                  } else {
-                    return listMessageWidget(messageList);
-                  }
-                  return LayoutBuilder(
-                      builder: (context, BoxConstraints constraints) {
-                    return ListView.separated(
-                      cacheExtent: constraints.maxHeight * 3,
-                      reverse: true,
-                      padding: EdgeInsets.all(20.h),
-                      controller: _scrollController,
-                      itemCount: messageList.length,
-                      separatorBuilder: (context, index) {
-                        return 24.verticalSpace;
-                      },
-                      itemBuilder: (context, index) {
-                        int reversedIndex = messageList.length - index - 1;
-                        ZIMKitMessage message = messageList[reversedIndex];
-                        // defaultWidget
-                        Widget defaultWidget = ZIMKitMessageWidget(
-                          key: ValueKey(message.hashCode),
-                          message: message,
-                          onPressed: widget.onPressed,
-                          onLongPress: widget.onLongPress,
-                        );
-                        // TODO spacing
-                        // TODO 时间间隔
-                        // customWidget
-                        return widget.itemBuilder?.call(context, message, defaultWidget) ?? defaultWidget;
-                      },
-                    );
-                  });
-                },
-              );
-            } else if (snapshot.hasError) {
-              // TODO 未实现加载失败
-              // defaultWidget
-              final Widget defaultWidget = Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () => setState(() {}),
-                      icon: const Icon(Icons.refresh_rounded),
+      child: FutureBuilder(
+        future: ZIMKit().getMessageListNotifier(
+            widget.conversationID, widget.conversationType),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return ValueListenableBuilder(
+              valueListenable:
+                  snapshot.data! as ValueNotifier<List<ZIMKitMessage>>,
+              builder: (BuildContext context, List<ZIMKitMessage> messageList,
+                  Widget? child) {
+                ZIMKit().clearUnreadCount(
+                    widget.conversationID, widget.conversationType);
+                if (messageList.isEmpty) {
+                  return Container(
+                    alignment: Alignment.center,
+                    margin: EdgeInsets.symmetric(horizontal: 50.w),
+                    child: Text(
+                      "Gửi tin nhắn đến chuyên gia của chúng tôi để nhận tư vấn nhé!",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.body1.copyWith(color: dark6),
                     ),
-                    Text(snapshot.error.toString()),
-                    const Text('Không thể tải. Vui lòng thử lại.'),
-                  ],
-                ),
-              );
+                  );
+                } else {
+                  return listMessageWidget(messageList);
+                }
+                return LayoutBuilder(
+                    builder: (context, BoxConstraints constraints) {
+                  return ListView.separated(
+                    cacheExtent: constraints.maxHeight * 3,
+                    reverse: true,
+                    padding: EdgeInsets.all(20.h),
+                    controller: _scrollController,
+                    itemCount: messageList.length,
+                    separatorBuilder: (context, index) {
+                      return 24.verticalSpace;
+                    },
+                    itemBuilder: (context, index) {
+                      int reversedIndex = messageList.length - index - 1;
+                      ZIMKitMessage message = messageList[reversedIndex];
+                      // defaultWidget
+                      Widget defaultWidget = ZIMKitMessageWidget(
+                        key: ValueKey(message.hashCode),
+                        message: message,
+                        onPressed: widget.onPressed,
+                        onLongPress: widget.onLongPress,
+                      );
+                      // TODO spacing
+                      // TODO 时间间隔
+                      // customWidget
+                      return widget.itemBuilder?.call(context, message, defaultWidget) ?? defaultWidget;
+                    },
+                  );
+                });
+              },
+            );
+          } else if (snapshot.hasError) {
+            // TODO 未实现加载失败
+            // defaultWidget
+            final Widget defaultWidget = Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () => setState(() {}),
+                    icon: const Icon(Icons.refresh_rounded),
+                  ),
+                  Text(snapshot.error.toString()),
+                  const Text('Không thể tải. Vui lòng thử lại.'),
+                ],
+              ),
+            );
 
-              // customWidget
-              return GestureDetector(
-                onTap: () => setState(() {}),
-                child: widget.errorBuilder?.call(context, defaultWidget) ??
-                    defaultWidget,
-              );
-            } else {
-              // defaultWidget
-              const Widget defaultWidget =
-                  Center(child: CircularProgressIndicator());
+            // customWidget
+            return GestureDetector(
+              onTap: () => setState(() {}),
+              child: widget.errorBuilder?.call(context, defaultWidget) ??
+                  defaultWidget,
+            );
+          } else {
+            // defaultWidget
+            const Widget defaultWidget =
+                Center(child: CircularProgressIndicator());
 
-              // customWidget
-              return widget.loadingBuilder?.call(context, defaultWidget) ??
-                  defaultWidget;
-            }
-          },
-        ),
+            // customWidget
+            return widget.loadingBuilder?.call(context, defaultWidget) ??
+                defaultWidget;
+          }
+        },
       ),
     );
   }

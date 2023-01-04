@@ -4,6 +4,7 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FullscreenImagePage extends StatefulWidget {
   final List<String> imageUrls;
@@ -65,8 +66,8 @@ class _FullscreenImagePageState extends State<FullscreenImagePage> {
             ),
           ),
           Positioned(
-              left: 16,
-              top: 30,
+              left: 5.w,
+              top: 35.w,
               child: IconButton(icon: const Icon(CupertinoIcons.xmark), onPressed: () => Navigator.of(context).pop()))
         ],
       ),

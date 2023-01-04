@@ -39,6 +39,8 @@ dependencies:
   grouped_list: ^5.1.2
   # Toast
   fluttertoast: ^8.1.1
+  #url
+  url_launcher: ^6.1.7
 
 dev_dependencies:
   flutter_test:

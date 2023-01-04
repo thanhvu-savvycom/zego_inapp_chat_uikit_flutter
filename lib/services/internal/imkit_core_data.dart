@@ -114,7 +114,7 @@ class ZIMKitCoreData {
     return ZIM
         .getInstance()!
         .login(currentUser!.baseInfo, _token)
-        .then((value) {
+        .then((value) async {
       ZIMKitLogger.info('login success');
 
       // query currentUser's full info
@@ -122,7 +122,7 @@ class ZIMKitCoreData {
         currentUser = zimResult;
         loginCompleter?.complete();
       });
-
+      // await getConversationListNotifier();
       return 0;
     }).catchError((error, stackTrace) {
       ZIMKitLogger.info('login error, $error');

@@ -40,11 +40,12 @@ class ZIMKitVideoMessagePlayerState extends State<ZIMKitVideoMessagePlayer> {
 
     if (youtubeId == null) {
       BetterPlayerDataSource? betterPlayerDataSource;
-      if (message.fileLocalPath.isNotEmpty && File(message.fileLocalPath).existsSync()) {
-        betterPlayerDataSource = BetterPlayerDataSource(BetterPlayerDataSourceType.file, message.fileLocalPath);
-      } else {
-        betterPlayerDataSource = BetterPlayerDataSource(BetterPlayerDataSourceType.network, message.fileDownloadUrl);
-      }
+      // if (message.fileLocalPath.isNotEmpty && File(message.fileLocalPath).existsSync()) {
+      //   betterPlayerDataSource = BetterPlayerDataSource(BetterPlayerDataSourceType.file, message.fileLocalPath);
+      // } else {
+      //   betterPlayerDataSource = BetterPlayerDataSource(BetterPlayerDataSourceType.network, message.fileDownloadUrl);
+      // }
+      betterPlayerDataSource = BetterPlayerDataSource(BetterPlayerDataSourceType.network, message.fileDownloadUrl);
 
       _betterPlayerController = BetterPlayerController(
           const BetterPlayerConfiguration(

@@ -19,15 +19,17 @@ class ZIMKitAvatar extends StatelessWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (BuildContext context, Widget? child) {
+        double widthValue = width ?? 32.r;
+        double heightValue = height ?? 32.r;
         return SizedBox(
-          width: width ?? 32.r,
-          height: height ?? 32.r,
+          width: widthValue,
+          height: heightValue,
           child: FutureBuilder(
             // TODO auto update user's avatar
             future: ZIMKit().queryUser(userID),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return (snapshot.data as ZIMUserFullInfo).icon;
+                return (snapshot.data as ZIMUserFullInfo).icon(width: width, height: height);
               } else {
                 return PrebuiltChatImage.asset(
                     PrebuiltChatIconUrls.iconAvatar, width: width, height: height);

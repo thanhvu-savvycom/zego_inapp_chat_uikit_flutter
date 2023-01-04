@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:zego_zimkit/compnents/internals/icon_defines.dart';
 
 import 'package:zego_zimkit/zego_zimkit.dart';
 
@@ -123,19 +124,20 @@ extension ZIMMessageExtend on ZIMMessage {
 }
 
 extension ZIMImageMessageExtend on ZIMImageMessage {
-  double get aspectRatio => (originalImageWidth / originalImageHeight) > 0
-      ? (originalImageWidth / originalImageHeight)
-      : 1.0;
+  double get aspectRatio =>
+      (originalImageWidth / originalImageHeight) > 0 ? (originalImageWidth / originalImageHeight) : 1.0;
 }
 
 extension ZIMUserFullInfoExtend on ZIMUserFullInfo {
   // TODO use ValueListenableBuilder
   // or ZIMUserFullInfo -> ZIMKitUser
-  Widget get icon {
-    const Widget placeholder = Icon(Icons.person);
+  Widget icon({double? height, double? width}) {
+    Widget placeholder = PrebuiltChatImage.asset(PrebuiltChatIconUrls.iconAvatar, width: width, height: height);
     return userAvatarUrl.isEmpty
         ? placeholder
         : CachedNetworkImage(
+            width: width,
+            height: height,
             imageUrl: userAvatarUrl,
             fit: BoxFit.cover,
             errorWidget: (context, _, __) => placeholder,
@@ -147,9 +149,7 @@ extension ZIMUserFullInfoExtend on ZIMUserFullInfo {
 extension ZIMString on String {
   ZIMConversationType? toConversationType() {
     try {
-      return ZIMConversationType.values
-          .where((element) => element.name == this)
-          .first;
+      return ZIMConversationType.values.where((element) => element.name == this).first;
     } catch (e) {
       return null;
     }
@@ -158,12 +158,15 @@ extension ZIMString on String {
 
 extension ZIMConversationExtend on ZIMConversation {
   String get id => conversationID;
+
   set id(String value) => conversationID = value;
 
   String get name => conversationName.isEmpty ? 'Car Doctor' : conversationName;
+
   set name(String value) => conversationName = value;
 
   String get url => conversationAvatarUrl;
+
   set url(String value) => conversationAvatarUrl = value;
 
   bool equal(ZIMConversation other) => id == other.id && type == other.type;
@@ -212,9 +215,13 @@ extension ZIMGroupFullInfoExtension on ZIMGroupFullInfo {
   }
 
   String get id => baseInfo.groupID;
+
   String get name => baseInfo.groupName;
+
   String get url => baseInfo.groupAvatarUrl;
+
   String get notice => groupNotice;
+
   Map<String, String> get attributes => groupAttributes;
 }
 
@@ -225,14 +232,15 @@ extension ZIMGroupExtension on ZIMGroup {
       ..name = baseInfo?.groupName ?? ''
       ..url = baseInfo?.groupAvatarUrl ?? ''
       ..type = ZIMConversationType.group
-      ..notificationStatus =
-          (notificationStatus == ZIMGroupMessageNotificationStatus.notify
-              ? ZIMConversationNotificationStatus.notify
-              : ZIMConversationNotificationStatus.doNotDisturb);
+      ..notificationStatus = (notificationStatus == ZIMGroupMessageNotificationStatus.notify
+          ? ZIMConversationNotificationStatus.notify
+          : ZIMConversationNotificationStatus.doNotDisturb);
   }
 
   String get id => baseInfo?.groupID ?? '';
+
   String get name => baseInfo?.groupName ?? '';
+
   String get url => baseInfo?.groupAvatarUrl ?? '';
 }
 
@@ -246,6 +254,8 @@ extension ZIMGroupInfoExtension on ZIMGroupInfo {
   }
 
   String get id => groupID;
+
   String get name => groupName;
+
   String get url => groupAvatarUrl;
 }

@@ -26,9 +26,11 @@ class ZIMKitMessageInput extends StatefulWidget {
     this.actions = const [],
     this.inputDecoration,
     this.theme,
-    this.appName
+    this.appName,
+    this.isReadOnly = true,
   }) : super(key: key);
 
+  final bool isReadOnly;
   /// The conversationID of the conversation to send message.
   final String conversationID;
 

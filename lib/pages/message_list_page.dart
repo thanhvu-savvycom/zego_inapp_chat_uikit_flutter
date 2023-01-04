@@ -106,6 +106,7 @@ class ZIMKitMessageListPage extends StatelessWidget {
         designSize: const Size(375, 812),
         minTextAdapt: true,
         splitScreenMode: true,
+        useInheritedMediaQuery: true,
         builder: (context, child) {
           return Theme(
               data: theme ?? Theme.of(context),
@@ -120,20 +121,22 @@ class ZIMKitMessageListPage extends StatelessWidget {
                             alignment: Alignment.center,
                             child: Column(
                               children: [
-                                ZIMKitMessageListView(
-                                  key: ValueKey('ZIMKitMessageListView:${Object.hash(
-                                    conversationID,
-                                    conversationType,
-                                  )}'),
-                                  conversationID: conversationID,
-                                  conversationType: conversationType,
-                                  onPressed: onMessageItemPressd,
-                                  itemBuilder: messageItemBuilder,
-                                  onLongPress: onMessageItemLongPress,
-                                  loadingBuilder: messageListLoadingBuilder,
-                                  errorBuilder: messageListErrorBuilder,
-                                  scrollController: messageListScrollController,
-                                  theme: theme,
+                                Expanded(
+                                  child: ZIMKitMessageListView(
+                                    key: ValueKey('ZIMKitMessageListView:${Object.hash(
+                                      conversationID,
+                                      conversationType,
+                                    )}'),
+                                    conversationID: conversationID,
+                                    conversationType: conversationType,
+                                    onPressed: onMessageItemPressd,
+                                    itemBuilder: messageItemBuilder,
+                                    onLongPress: onMessageItemLongPress,
+                                    loadingBuilder: messageListLoadingBuilder,
+                                    errorBuilder: messageListErrorBuilder,
+                                    scrollController: messageListScrollController,
+                                    theme: theme,
+                                  ),
                                 ),
                                 ZIMKitMessageInput(
                                   key: ValueKey('ZIMKitMessageInput:${Object.hash(
@@ -162,6 +165,7 @@ class ZIMKitMessageListPage extends StatelessWidget {
       elevation: 0,
       leadingWidth: 50.w,
       titleSpacing: 0,
+      centerTitle: true,
       leading: (Navigator.of(context).canPop() == true
           ? GestureDetector(
               onTap: () {
@@ -179,7 +183,7 @@ class ZIMKitMessageListPage extends StatelessWidget {
           : null),
       // iconTheme: IconThemeData(color: iconColor ?? R.color.black),
       title: Text(
-        ZIMKit().getConversation(conversationID, conversationType).name,
+        appName ?? ZIMKit().getConversation(conversationID, conversationType).name,
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.h5Bold,
       ),
