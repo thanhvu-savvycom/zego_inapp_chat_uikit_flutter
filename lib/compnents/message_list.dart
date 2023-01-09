@@ -11,37 +11,28 @@ import '../zego_zimkit.dart';
 
 // featureList
 class ZIMKitMessageListView extends StatefulWidget {
-  const ZIMKitMessageListView({
-    Key? key,
-    required this.conversationID,
-    this.conversationType = ZIMConversationType.peer,
-    this.onPressed,
-    this.itemBuilder,
-    this.loadingBuilder,
-    this.onLongPress,
-    this.errorBuilder,
-    this.scrollController,
-    this.theme,
-  }) : super(key: key);
+  const ZIMKitMessageListView(
+      {Key? key,
+      required this.conversationID,
+      this.conversationType = ZIMConversationType.peer,
+      this.onPressed,
+      this.itemBuilder,
+      this.loadingBuilder,
+      this.onLongPress,
+      this.errorBuilder,
+      this.scrollController,
+      this.theme})
+      : super(key: key);
 
   final String conversationID;
   final ZIMConversationType conversationType;
-
   final ScrollController? scrollController;
 
-  final void Function(
-          BuildContext context, ZIMKitMessage message, Function defaultAction)?
-      onPressed;
-  final void Function(
-          BuildContext context, ZIMKitMessage message, Function defaultAction)?
-      onLongPress;
-  final Widget Function(
-          BuildContext context, ZIMKitMessage message, Widget defaultWidget)?
-      itemBuilder;
-  final Widget Function(BuildContext context, Widget defaultWidget)?
-      errorBuilder;
-  final Widget Function(BuildContext context, Widget defaultWidget)?
-      loadingBuilder;
+  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onPressed;
+  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onLongPress;
+  final Widget Function(BuildContext context, ZIMKitMessage message, Widget defaultWidget)? itemBuilder;
+  final Widget Function(BuildContext context, Widget defaultWidget)? errorBuilder;
+  final Widget Function(BuildContext context, Widget defaultWidget)? loadingBuilder;
 
   // theme
   final ThemeData? theme;
@@ -52,8 +43,8 @@ class ZIMKitMessageListView extends StatefulWidget {
 
 class _ZIMKitMessageListViewState extends State<ZIMKitMessageListView> {
   final ScrollController _defaultScrollController = ScrollController();
-  ScrollController get _scrollController =>
-      widget.scrollController ?? _defaultScrollController;
+
+  ScrollController get _scrollController => widget.scrollController ?? _defaultScrollController;
 
   Completer? _loadMoreCompleter;
 
@@ -74,12 +65,9 @@ class _ZIMKitMessageListViewState extends State<ZIMKitMessageListView> {
 
   void scrollControllerListener() async {
     if (_loadMoreCompleter == null || _loadMoreCompleter!.isCompleted) {
-      if (_scrollController.position.pixels >=
-          0.8 * _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels >= 0.8 * _scrollController.position.maxScrollExtent) {
         _loadMoreCompleter = Completer();
-        if (0 ==
-            await ZIMKit().loadMoreMessage(
-                widget.conversationID, widget.conversationType)) {
+        if (0 == await ZIMKit().loadMoreMessage(widget.conversationID, widget.conversationType)) {
           _scrollController.removeListener(scrollControllerListener);
         }
         _loadMoreCompleter!.complete();
@@ -92,17 +80,13 @@ class _ZIMKitMessageListViewState extends State<ZIMKitMessageListView> {
     return Theme(
       data: widget.theme ?? Theme.of(context).copyWith(backgroundColor: white),
       child: FutureBuilder(
-        future: ZIMKit().getMessageListNotifier(
-            widget.conversationID, widget.conversationType),
+        future: ZIMKit().getMessageListNotifier(widget.conversationID, widget.conversationType),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return ValueListenableBuilder(
-              valueListenable:
-                  snapshot.data! as ValueNotifier<List<ZIMKitMessage>>,
-              builder: (BuildContext context, List<ZIMKitMessage> messageList,
-                  Widget? child) {
-                ZIMKit().clearUnreadCount(
-                    widget.conversationID, widget.conversationType);
+              valueListenable: snapshot.data! as ValueNotifier<List<ZIMKitMessage>>,
+              builder: (BuildContext context, List<ZIMKitMessage> messageList, Widget? child) {
+                ZIMKit().clearUnreadCount(widget.conversationID, widget.conversationType);
                 if (messageList.isEmpty) {
                   return Container(
                     alignment: Alignment.center,
@@ -116,8 +100,7 @@ class _ZIMKitMessageListViewState extends State<ZIMKitMessageListView> {
                 } else {
                   return listMessageWidget(messageList);
                 }
-                return LayoutBuilder(
-                    builder: (context, BoxConstraints constraints) {
+                return LayoutBuilder(builder: (context, BoxConstraints constraints) {
                   return ListView.separated(
                     cacheExtent: constraints.maxHeight * 3,
                     reverse: true,
@@ -166,17 +149,14 @@ class _ZIMKitMessageListViewState extends State<ZIMKitMessageListView> {
             // customWidget
             return GestureDetector(
               onTap: () => setState(() {}),
-              child: widget.errorBuilder?.call(context, defaultWidget) ??
-                  defaultWidget,
+              child: widget.errorBuilder?.call(context, defaultWidget) ?? defaultWidget,
             );
           } else {
             // defaultWidget
-            const Widget defaultWidget =
-                Center(child: CircularProgressIndicator());
+            const Widget defaultWidget = Center(child: CircularProgressIndicator());
 
             // customWidget
-            return widget.loadingBuilder?.call(context, defaultWidget) ??
-                defaultWidget;
+            return widget.loadingBuilder?.call(context, defaultWidget) ?? defaultWidget;
           }
         },
       ),
@@ -203,6 +183,10 @@ class _ZIMKitMessageListViewState extends State<ZIMKitMessageListView> {
     }
   }
 
+  int reversedIndex(List<ZIMKitMessage> messageList, ZIMKitMessage item) => messageList.length -
+      messageList.indexWhere((element) => element.data.value.messageID == item.data.value.messageID) -
+      1;
+
   Widget listMessageWidget(List<ZIMKitMessage> messageList) {
     return GroupedListView(
       shrinkWrap: true,
@@ -210,11 +194,18 @@ class _ZIMKitMessageListViewState extends State<ZIMKitMessageListView> {
       reverse: true,
       padding: EdgeInsets.all(20.h),
       controller: _scrollController,
-      groupBy: (ZIMKitMessage element) {
-        DateTime time = DateTime.fromMillisecondsSinceEpoch(element.data.value.timestamp);
+      groupBy: (ZIMKitMessage item) {
+        ZIMKitMessage message = messageList[reversedIndex(messageList, item)];
+        DateTime time = DateTime.fromMillisecondsSinceEpoch(
+          message.data.value.timestamp,
+        );
+        // print("groupBy");
+        // print(time.millisecondsSinceEpoch);
         return DateTime(time.year, time.month, time.day);
       },
       groupSeparatorBuilder: (DateTime element) {
+        // print("groupSeparatorBuilder");
+        // print(element.millisecondsSinceEpoch);
         return Padding(
           padding: EdgeInsets.only(top: 16.h, bottom: 16.h),
           child: Text(
@@ -225,6 +216,30 @@ class _ZIMKitMessageListViewState extends State<ZIMKitMessageListView> {
           ),
         );
       },
+      groupComparator: (DateTime date1, DateTime date2) {
+        // print("groupComparator");
+        // print(date1.millisecondsSinceEpoch);
+        // print(date2.millisecondsSinceEpoch);
+        return date2.compareTo(date1);
+      },
+      //   groupHeaderBuilder: (ZIMKitMessage item) {
+      //     int reversedIndex = messageList.length -
+      //         messageList.indexWhere((element) => element.data.value.messageID == item.data.value.messageID) -
+      //         1;
+      //     int index =  messageList.indexWhere((element) => element.data.value.messageID == item.data.value.messageID);
+      //     ZIMKitMessage message = messageList[reversedIndex];
+      //     DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(message.data.value.timestamp);
+      //     return Padding(
+      //             padding: EdgeInsets.only(top: 16.h, bottom: 16.h),
+      //             child: Text(
+      //               (DateTime.now().difference(dateTime).inDays > 365 ? DateFormat.yMMMMd('vi_VN') : DateFormat.MMMMd('vi_VN'))
+      //                   .format(dateTime),
+      //               textAlign: TextAlign.center,
+      //               style: Theme.of(context).textTheme.labelLargeText.copyWith(color: dark9),
+      //             ),
+      //           );
+      // },
+      // sort: false,
       itemComparator: (ZIMKitMessage data1, ZIMKitMessage data2) {
         return data1.data.value.timestamp.compareTo(data2.data.value.timestamp);
       },
@@ -232,9 +247,7 @@ class _ZIMKitMessageListViewState extends State<ZIMKitMessageListView> {
       // optional
       separator: 0.verticalSpace,
       itemBuilder: (context, ZIMKitMessage item) {
-        int reversedIndex = messageList.length -
-            messageList.indexWhere((element) => element.data.value.messageID == item.data.value.messageID) -
-            1;
+        int reversedIndex = this.reversedIndex(messageList, item);
         ZIMKitMessage message = messageList[reversedIndex];
         // defaultWidget
         Widget defaultWidget = ZIMKitMessageWidget(
@@ -249,7 +262,7 @@ class _ZIMKitMessageListViewState extends State<ZIMKitMessageListView> {
         // TODO 时间间隔
         // customWidget
         return Container(
-          margin: EdgeInsets.only(top: (isSameUserPreviousMsg(messageList, reversedIndex) ? 5 : 24).h),
+            margin: EdgeInsets.only(top: (isSameUserPreviousMsg(messageList, reversedIndex) ? 5 : 24).h),
             child: widget.itemBuilder?.call(context, message, defaultWidget) ?? defaultWidget);
       },
       floatingHeader: false,

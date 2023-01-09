@@ -203,7 +203,7 @@ class _ZIMKitMessageInputState extends State<ZIMKitMessageInput> {
                       child: TextField(
                         onSubmitted: (value) => sendTextMessage(),
                         controller: _editingController,
-                        onChanged: (value) => isTyping.value = value.isNotEmpty,
+                        onChanged: (value) => isTyping.value = value.trim().isNotEmpty,
                         maxLength: 500,
                         maxLines: 5,
                         minLines: 1,
@@ -305,7 +305,7 @@ class _ZIMKitMessageInputState extends State<ZIMKitMessageInput> {
     ZIMKit().sendTextMessage(
       widget.conversationID,
       widget.conversationType,
-      _editingController.text,
+      _editingController.text.trim(),
       onMessageSent: widget.onMessageSent,
       preMessageSending: widget.preMessageSending,
     );

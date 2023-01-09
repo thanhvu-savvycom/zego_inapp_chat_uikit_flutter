@@ -133,8 +133,6 @@ class _ZIMKitConversationListViewState
                       itemCount: conversationList.length,
                       itemBuilder: (context, index) {
                         final conversation = conversationList[index];
-                        // defaultAction
-
                         // defaultWidget
                         final Widget defaultWidget = ZIMKitConversationWidget(
                           conversationID: conversationList[index].id,

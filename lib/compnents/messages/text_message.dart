@@ -42,7 +42,7 @@ class ZIMKitTextMessage extends StatelessWidget {
                 child: LinkWell(
                   message.message,
                   style: Theme.of(context).textTheme.body1.copyWith(color: message.isSender ? white : dark1, height: 1),
-                  textAlign: message.isSender ? TextAlign.right : TextAlign.left,
+                  textAlign: /*message.isSender ? TextAlign.right : */TextAlign.left,
                   linkStyle: Theme.of(context).textTheme.body1.copyWith(color: message.isSender ? white : blue, decoration: TextDecoration.underline, height: 1),
                 ),
               )
