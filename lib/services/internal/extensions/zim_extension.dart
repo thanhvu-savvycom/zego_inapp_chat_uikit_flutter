@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -132,7 +133,8 @@ extension ZIMUserFullInfoExtend on ZIMUserFullInfo {
   // TODO use ValueListenableBuilder
   // or ZIMUserFullInfo -> ZIMKitUser
   Widget icon({double? height, double? width}) {
-    Widget placeholder = PrebuiltChatImage.asset(PrebuiltChatIconUrls.iconAvatar, width: width, height: height);
+    // Widget placeholder = PrebuiltChatImage.asset(PrebuiltChatIconUrls.iconAvatar, width: width, height: height);
+    Widget placeholder =  Icon(CupertinoIcons.person_circle_fill, size: width,);
     return userAvatarUrl.isEmpty
         ? placeholder
         : CachedNetworkImage(

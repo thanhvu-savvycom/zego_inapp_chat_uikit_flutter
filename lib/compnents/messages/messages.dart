@@ -126,6 +126,25 @@ class ZIMKitMessageWidget extends StatelessWidget {
         });
   }
 
+  Widget buildSenderName(BuildContext context, ZIMKitMessage message) {
+    return  FutureBuilder(
+      // TODO auto update user's avatar
+      future: ZIMKit().queryUser(message.senderUserID),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Padding(padding: EdgeInsets.only(bottom: 5.h), child: Text((snapshot.data as ZIMUserFullInfo).baseInfo.userName ?? "", style: Theme
+              .of(context)
+              .textTheme
+              .smallNormal.copyWith(color: dark9),),);
+        } else {
+          return Container();
+          // return PrebuiltChatImage.asset(
+          //     PrebuiltChatIconUrls.iconAvatar, width: width, height: height);
+        }
+      },
+    );
+  }
+
   // TODO how to custom layout
   // TODO timestamp
   Widget localMessage(BuildContext context, ZIMKitMessage message) {
@@ -157,7 +176,16 @@ class ZIMKitMessageWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         buildAvatar(context, message),
-        buildMessage(context, message),
+        Flexible(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              buildSenderName(context, message),
+              buildMessage(context, message),
+            ],
+          ),
+        ),
         buildTime(context, message),
       ],
     );

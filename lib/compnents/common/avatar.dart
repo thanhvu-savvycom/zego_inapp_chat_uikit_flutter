@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:zego_zimkit/zego_zimkit.dart';
@@ -31,8 +32,9 @@ class ZIMKitAvatar extends StatelessWidget {
               if (snapshot.hasData) {
                 return (snapshot.data as ZIMUserFullInfo).icon(width: width, height: height);
               } else {
-                return PrebuiltChatImage.asset(
-                    PrebuiltChatIconUrls.iconAvatar, width: width, height: height);
+                return Icon(CupertinoIcons.person_circle_fill, size: width,);
+                // return PrebuiltChatImage.asset(
+                //     PrebuiltChatIconUrls.iconAvatar, width: width, height: height);
               }
             },
           ),
