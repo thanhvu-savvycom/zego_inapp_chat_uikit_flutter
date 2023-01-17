@@ -31,7 +31,6 @@ mixin ZIMKitInputService {
     const supportAudioList = <String>['mp3', 'm4a']; // <300s, <6M
 
     var messageType = ZIMMessageType.file;
-
     if (supportImageList.contains(file.extension)) {
       messageType = ZIMMessageType.image;
     } else if (supportVideoList.contains(file.extension)) {
@@ -78,6 +77,6 @@ mixin ZIMKitInputService {
     return messageType;
   }
 
-  String? extension(String path) => path.split('.').last;
+  String? extension(String path) => path.split('.').last.toLowerCase();
 
 }
