@@ -35,7 +35,8 @@ class ZIMKitVideoMessagePlayerState extends State<ZIMKitVideoMessagePlayer> {
 
   @override
   void initState() {
-    final ZIMVideoMessage message = widget.message.data.value as ZIMVideoMessage;
+    final ZIMVideoMessage message =
+        widget.message.data.value as ZIMVideoMessage;
     youtubeId = YoutubePlayer.convertUrlToId(message.fileDownloadUrl);
 
     if (youtubeId == null) {
@@ -45,13 +46,15 @@ class ZIMKitVideoMessagePlayerState extends State<ZIMKitVideoMessagePlayer> {
       // } else {
       //   betterPlayerDataSource = BetterPlayerDataSource(BetterPlayerDataSourceType.network, message.fileDownloadUrl);
       // }
-      betterPlayerDataSource = BetterPlayerDataSource(BetterPlayerDataSourceType.network, message.fileDownloadUrl);
+      betterPlayerDataSource = BetterPlayerDataSource(
+          BetterPlayerDataSourceType.network, message.fileDownloadUrl);
 
       _betterPlayerController = BetterPlayerController(
           const BetterPlayerConfiguration(
               autoPlay: true,
               showPlaceholderUntilPlay: false,
               // fullScreenByDefault: true,
+              aspectRatio: 9 / 16,
               fit: BoxFit.contain,
               autoDetectFullscreenAspectRatio: true),
           betterPlayerDataSource: betterPlayerDataSource);
@@ -71,7 +74,8 @@ class ZIMKitVideoMessagePlayerState extends State<ZIMKitVideoMessagePlayer> {
 
   @override
   Widget build(BuildContext context) {
-    bool isPortrait = MediaQuery.of(context).orientation == Orientation.portrait;
+    bool isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
     return Material(
       type: MaterialType.transparency,
       child: Stack(
@@ -79,7 +83,9 @@ class ZIMKitVideoMessagePlayerState extends State<ZIMKitVideoMessagePlayer> {
           Container(
               alignment: Alignment.center,
               color: black,
-              child: youtubeId == null ? _normalVideoWidget() : _youtubeVideoWidget()),
+              child: youtubeId == null
+                  ? _normalVideoWidget()
+                  : _youtubeVideoWidget()),
           if (isPortrait)
             Align(
               alignment: Alignment.topLeft,
