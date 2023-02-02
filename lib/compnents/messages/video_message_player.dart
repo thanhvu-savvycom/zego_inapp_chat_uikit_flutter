@@ -5,6 +5,7 @@ import 'package:better_player/better_player.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:zego_zimkit/compnents/common/single_tap_detector.dart';
@@ -56,7 +57,13 @@ class ZIMKitVideoMessagePlayerState extends State<ZIMKitVideoMessagePlayer> {
               // fullScreenByDefault: true,
               aspectRatio: 9 / 16,
               fit: BoxFit.contain,
-              autoDetectFullscreenAspectRatio: true),
+              autoDetectFullscreenAspectRatio: true,
+              autoDetectFullscreenDeviceOrientation: true,
+              deviceOrientationsAfterFullScreen: [
+                DeviceOrientation.portraitUp,
+                DeviceOrientation.portraitDown,
+              ]
+          ),
           betterPlayerDataSource: betterPlayerDataSource);
     } else {
       _youtubeController = YoutubePlayerController(
