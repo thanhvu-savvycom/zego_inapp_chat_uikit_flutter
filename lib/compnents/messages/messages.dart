@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
@@ -31,11 +32,21 @@ class ZIMKitMessageWidget extends StatelessWidget {
   }) : super(key: key);
 
   final ZIMKitMessage message;
-  final Widget Function(BuildContext context, ZIMKitMessage message, Widget defaultWidget)? avatarBuilder;
-  final Widget Function(BuildContext context, ZIMKitMessage message, Widget defaultWidget)? statusBuilder;
-  final Widget Function(BuildContext context, ZIMKitMessage message, Widget defaultWidget)? timestampBuilder;
-  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onPressed;
-  final void Function(BuildContext context, ZIMKitMessage message, Function defaultAction)? onLongPress;
+  final Widget Function(
+          BuildContext context, ZIMKitMessage message, Widget defaultWidget)?
+      avatarBuilder;
+  final Widget Function(
+          BuildContext context, ZIMKitMessage message, Widget defaultWidget)?
+      statusBuilder;
+  final Widget Function(
+          BuildContext context, ZIMKitMessage message, Widget defaultWidget)?
+      timestampBuilder;
+  final void Function(
+          BuildContext context, ZIMKitMessage message, Function defaultAction)?
+      onPressed;
+  final void Function(
+          BuildContext context, ZIMKitMessage message, Function defaultAction)?
+      onLongPress;
   final bool isSameUserPreviousMsg, isSameUserNextMsg;
 
   // TODO default onPressed onLongPress action
@@ -43,15 +54,20 @@ class ZIMKitMessageWidget extends StatelessWidget {
   Widget buildMessage(BuildContext context, ZIMKitMessage message) {
     switch (message.data.value.type) {
       case ZIMMessageType.text:
-        return ZIMKitTextMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZIMKitTextMessage(
+            onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.audio:
-        return ZIMKitAudioMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZIMKitAudioMessage(
+            onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.video:
-        return ZIMKitVideoMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZIMKitVideoMessage(
+            onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.file:
-        return ZIMKitFileMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZIMKitFileMessage(
+            onLongPress: onLongPress, onPressed: onPressed, message: message);
       case ZIMMessageType.image:
-        return ZIMKitImageMessage(onLongPress: onLongPress, onPressed: onPressed, message: message);
+        return ZIMKitImageMessage(
+            onLongPress: onLongPress, onPressed: onPressed, message: message);
 
       default:
         return Text(message.data.value.type.toString());
@@ -85,8 +101,7 @@ class ZIMKitMessageWidget extends StatelessWidget {
                       padding: EdgeInsets.only(left: 6.w),
                       child: Text(
                         "Không gửi được tin nhắn",
-                        style: Theme
-                            .of(context)
+                        style: Theme.of(context)
                             .textTheme
                             .smallNormal
                             .copyWith(color: danger, height: 1),
@@ -98,7 +113,8 @@ class ZIMKitMessageWidget extends StatelessWidget {
             ],
           );
         });
-    return statusBuilder?.call(context, message, defaultStatusWidget) ?? defaultStatusWidget;
+    return statusBuilder?.call(context, message, defaultStatusWidget) ??
+        defaultStatusWidget;
   }
 
   Widget buildAvatar(BuildContext context, ZIMKitMessage message) {
@@ -106,7 +122,8 @@ class ZIMKitMessageWidget extends StatelessWidget {
       padding: EdgeInsets.only(right: 12.w),
       child: ZIMKitAvatar(userID: message.senderUserID),
     );
-    return avatarBuilder?.call(context, message, defaultAvatarWidget) ?? defaultAvatarWidget;
+    return avatarBuilder?.call(context, message, defaultAvatarWidget) ??
+        defaultAvatarWidget;
   }
 
   Widget buildTime(BuildContext context, ZIMKitMessage message) {
@@ -116,9 +133,9 @@ class ZIMKitMessageWidget extends StatelessWidget {
           return Padding(
               padding: EdgeInsets.symmetric(horizontal: 7.w),
               child: Text(
-                DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(message.timestamp)),
-                style: Theme
-                    .of(context)
+                DateFormat.Hm().format(
+                    DateTime.fromMillisecondsSinceEpoch(message.timestamp)),
+                style: Theme.of(context)
                     .textTheme
                     .smallNormal
                     .copyWith(color: dark7),
@@ -127,15 +144,21 @@ class ZIMKitMessageWidget extends StatelessWidget {
   }
 
   Widget buildSenderName(BuildContext context, ZIMKitMessage message) {
-    return  FutureBuilder(
+    return FutureBuilder(
       // TODO auto update user's avatar
       future: ZIMKit().queryUser(message.senderUserID),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return Padding(padding: EdgeInsets.only(bottom: 5.h), child: Text((snapshot.data as ZIMUserFullInfo).baseInfo.userName ?? "", style: Theme
-              .of(context)
-              .textTheme
-              .smallNormal.copyWith(color: dark9),),);
+          return Padding(
+            padding: EdgeInsets.only(bottom: 5.h),
+            child: Text(
+              (snapshot.data as ZIMUserFullInfo).baseInfo.userName ?? "",
+              style: Theme.of(context)
+                  .textTheme
+                  .smallNormal
+                  .copyWith(color: dark9),
+            ),
+          );
         } else {
           return Container();
           // return PrebuiltChatImage.asset(
@@ -163,8 +186,7 @@ class ZIMKitMessageWidget extends StatelessWidget {
         ),
         // buildAvatar(context, message),
         Visibility(
-            visible: !isSameUserNextMsg,
-            child: buildStatus(context, message)),
+            visible: !isSameUserNextMsg, child: buildStatus(context, message)),
       ],
     );
   }
@@ -175,7 +197,14 @@ class ZIMKitMessageWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        buildAvatar(context, message),
+        // buildAvatar(context, message),
+        Padding(
+          padding: EdgeInsets.only(right: 12.w),
+          child: Icon(
+            CupertinoIcons.person_circle_fill,
+            size: 32.r,
+          ),
+        ),
         Flexible(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -193,6 +222,8 @@ class ZIMKitMessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return (message.isSender) ? localMessage(context, message) : remoteMessage(context, message);
+    return (message.isSender)
+        ? localMessage(context, message)
+        : remoteMessage(context, message);
   }
 }
